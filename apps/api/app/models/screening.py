@@ -7,6 +7,7 @@ from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UtcDateTime, utcnow
+from app.models.chat import Conversation
 from app.models.user import Locale
 
 
@@ -61,6 +62,8 @@ class Screening(Base):
     shares: Mapped[list["ReportShare"]] = relationship(
         back_populates="screening", cascade="all, delete-orphan", order_by="ReportShare.id"
     )
+    # "Ask about my results" chats: deleting the screening deletes what was said about it.
+    conversations: Mapped[list["Conversation"]] = relationship(cascade="all, delete-orphan")
 
 
 class ScreeningAnswer(Base):

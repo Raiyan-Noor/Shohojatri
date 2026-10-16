@@ -1,5 +1,29 @@
 # Changelog
 
+## B8 — Results chat (2026-10-17)
+
+"Ask about my results" (SCREENING_SPEC §8). **Scope change:** "Find specialists near me" (directory seed, `/specialists/nearby`, map) was dropped from this phase by decision; the result screen still shows it as "coming soon", and SCREENING_SPEC §8 says so.
+
+### API
+- `ai/llm.py`: `stream_text()` streams a reply through the Responses API (`store=False`, the same reasoning effort, quota and timeout as `structured()`). Configuration, the daily cap and the request itself are checked before it returns, so the router can still answer with a JSON error; failures mid-stream become `LLMError`. `with_safety()` appends `prompts/safety.md` (COMPANION_SPEC §13.4) and names both versions (`results_explainer-1+safety-1`).
+- `prompts/results_explainer.md`: how the screening and score work, the four classes and what to recommend, plain-text replies in the requested language, "your child" (the model is never given the name).
+- `ai/results_chat.py` builds the prompt data from this one screening (SCREENING_SPEC §8 lists what's in it) and the last 12 messages.
+- `GET /screenings/{id}/chat` (history + `ai_available`) and `POST /screenings/{id}/chat` (SSE: `delta` / `done` / `error`). Parent only, finalized screenings only. Question and reply are saved together once the reply completes; errors before the stream are 503 `ai_not_configured`, 429 `ai_quota_exceeded`, 502 `ai_unavailable`. SSE responses send `Cache-Control: no-cache, no-transform` so the Next rewrite doesn't buffer them.
+- New tables `conversations` and `messages` (COMPANION_SPEC §15), migration `3032782ac0b9`. Deleting a screening deletes its chats (ORM cascade, as SQLite has no FK pragma).
+- Tests (`test_results_chat.py`, LLM mocked): the prompt holds this screening's data and none of another family's screening, another chat, an older screening of the same child or the child's name; result, answers and class bands are in it; safety rules close the prompt; streaming, saving and history; history cap; broken and empty streams save nothing; not configured / quota / failed request; access (409 not finalized, 403 specialist, 404 stranger); length limits; delete cascade; `_deltas` event handling.
+
+### Web
+- `/screening/[id]/chat` (design Results C1): header with the report's date, a "not a diagnosis" banner, history, live streamed reply with a "looking at the report…" state, the four suggestion chips from the spec, and a composer. On failure the question goes back in the box with "Try again"; "AI not available" has its own state. Leaving the page aborts the stream.
+- `apiFetch()` in `lib/api/client.ts`: raw fetch with the same 401 refresh-and-retry, for the stream. `lib/screening/chat.ts` parses the SSE.
+- The result screen's "Ask about my results" is now a link; "Find specialists" stays "coming soon".
+- Strings in bn + en; Bangla entries added to `messages/_review.md`.
+
+### Verified
+- API: `ruff check`, `ruff format --check`, `pytest` (736 passed), migration upgrade → downgrade → upgrade on a fresh SQLite DB, `alembic check` clean.
+- Web: `pnpm typecheck`, `pnpm lint`, prettier.
+- Against a scratch API on :8011 with `llm.stream_text` replaced by a fake streaming generator (there is no OpenAI key locally) and `next dev` on :3011: the stream arrives through the Next rewrite in pieces (41 chunks over 1.6 s, not buffered); in Chrome, a chip and the composer ask questions, the reply streams and stays after reload, a failing stream shows the Bangla error with the question restored, and the newest reply scrolls clear of the sticky composer.
+- **Not verified:** a real OpenAI reply (no key here), so the Bangla quality of `results_explainer.md` is untested; the English page and a 390 px viewport in the browser.
+
 ## Deploy — first public deployment (pitch demo) (2026-10-17)
 
 Readies the app for Render (API + Postgres, Singapore) and Vercel (web, `sin1`) before the companion module. No feature changes. Steps: `docs/DEPLOY.md`.

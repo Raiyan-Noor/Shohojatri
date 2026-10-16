@@ -735,6 +735,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/screenings/{screening_id}/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Results Chat */
+        get: operations["getResultsChat"];
+        put?: never;
+        /** Ask Results Chat */
+        post: operations["askResultsChat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/demo/screening-tasks/{fixture_task}": {
         parameters: {
             query?: never;
@@ -872,6 +890,24 @@ export interface components {
             /** New Password */
             new_password: string;
         };
+        /** ChatMessageOut */
+        ChatMessageOut: {
+            /** Id */
+            id: number;
+            role: components["schemas"]["ChatRole"];
+            /** Content */
+            content: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * ChatRole
+         * @enum {string}
+         */
+        ChatRole: "user" | "assistant";
         /** ChildCode */
         ChildCode: {
             /** Code */
@@ -1644,6 +1680,19 @@ export interface components {
             demo: boolean;
             device: components["schemas"]["DeviceInfo"] | null;
             quality: components["schemas"]["CaptureQuality"] | null;
+        };
+        /** ResultsChatOut */
+        ResultsChatOut: {
+            /** Ai Available */
+            ai_available: boolean;
+            /** Messages */
+            messages: components["schemas"]["ChatMessageOut"][];
+        };
+        /** ResultsChatRequest */
+        ResultsChatRequest: {
+            /** Message */
+            message: string;
+            locale: components["schemas"]["Locale"];
         };
         /**
          * RiskClass
@@ -3531,6 +3580,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SharedReportOut"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getResultsChat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                screening_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultsChatOut"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    askResultsChat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                screening_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResultsChatRequest"];
+            };
+        };
+        responses: {
+            /** @description The streamed reply */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
                 };
             };
             /** @description Error */

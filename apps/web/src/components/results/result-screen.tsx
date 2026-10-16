@@ -22,7 +22,12 @@ import { Card } from "@/components/ui/card";
 import { StateView } from "@/components/ui/state-view";
 import { Link, useRouter } from "@/lib/i18n/navigation";
 import { useScreening, useScreeningReport } from "@/lib/screening/queries";
-import { clinicianReportPath, parentReportPath, type Report } from "@/lib/screening/results";
+import {
+  clinicianReportPath,
+  parentReportPath,
+  type Report,
+  resultsChatPath,
+} from "@/lib/screening/results";
 import { resumePath } from "@/lib/screening/rules";
 
 import {
@@ -145,9 +150,15 @@ function ResultBody({ report }: { report: Report }) {
         >
           {t("actions.share")}
         </Button>
-        {/* Built in B8 (SCREENING_SPEC §8); shown now so the parent knows they're coming. */}
+        {/* Not built in this phase; shown so the parent knows it's coming. */}
         <Soon icon={MapPin} label={t("actions.specialists")} />
-        <Soon icon={MessageCircleQuestion} label={t("actions.chat")} />
+        <Link
+          href={resultsChatPath(report.screening_id)}
+          className={buttonClasses({ variant: "secondary", block: true })}
+        >
+          <MessageCircleQuestion aria-hidden className="size-5" />
+          {t("actions.chat")}
+        </Link>
       </div>
 
       <div className="flex flex-col gap-1 border-t border-border-1 pt-4">

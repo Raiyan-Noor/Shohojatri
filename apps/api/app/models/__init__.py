@@ -3,6 +3,7 @@
 from app.models.access import AccessGrant, AccessRequest, AccessRequestStatus, GrantScope
 from app.models.activity import AuditLog, Notification, NotificationKind
 from app.models.base import Base
+from app.models.chat import ChatMessage, ChatRole, Conversation, ConversationMode
 from app.models.child import Child, ChildStatus, Sex
 from app.models.screening import (
     Informant,
@@ -21,8 +22,12 @@ __all__ = [
     "AccessRequestStatus",
     "AuditLog",
     "Base",
+    "ChatMessage",
+    "ChatRole",
     "Child",
     "ChildStatus",
+    "Conversation",
+    "ConversationMode",
     "GrantScope",
     "Informant",
     "LlmUsage",

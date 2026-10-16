@@ -29,6 +29,9 @@ OPTION_MEANINGS = {
     "little": "Rarely tries to communicate",
     "no": "No",
     "yes": "Yes",
+    # q20 (hearing): never mapped, but the results chat describes the answer.
+    "yes_normal": "Yes, and the result was normal",
+    "yes_problem": "Yes, and it found a problem",
 }
 LANGUAGES = {Locale.bn: "Bangla", Locale.en: "English"}
 

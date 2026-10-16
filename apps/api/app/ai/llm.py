@@ -1,7 +1,8 @@
 """The only module that calls OpenAI (CLAUDE.md §5).
 
-Minimal for B4 (OPEN_QUESTIONS #4): prompt files and one structured-output call. Streaming and
-the shared safety prompt arrive with the chat in B8.
+Prompt files (each with a `version` header), one structured-output call (`structured`) and
+streamed chat replies (`stream_text`). Chat prompts end with the shared safety rules
+(`with_safety`, COMPANION_SPEC §13.4).
 
 Without OPENAI_API_KEY the app still runs: callers get LLMNotConfiguredError and fall back.
 Each user has a daily call cap (LLM_DAILY_CAP); past it, callers get LLMQuotaExceededError,
@@ -10,11 +11,14 @@ which is an LLMError, so every caller already falls back.
 
 import logging
 import re
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import Any, Literal
 
 import openai
+from openai.types.responses import EasyInputMessageParam
 from pydantic import BaseModel
 from sqlalchemy import update
 from sqlalchemy.dialects import postgresql, sqlite
@@ -61,6 +65,23 @@ def load_prompt(name: str) -> Prompt:
     if not version:
         raise ValueError(f"prompt {name}: missing version")
     return Prompt(name=name, version=version, text=match["body"].strip())
+
+
+def with_safety(prompt: Prompt) -> Prompt:
+    """`prompt` followed by the safety rules. The version names both, so a stored reply says
+    which rules it was written under."""
+    safety = load_prompt("safety")
+    return Prompt(
+        name=prompt.name,
+        version=f"{prompt.version}+{safety.version}",
+        text=f"{prompt.text}\n\n{safety.text}",
+    )
+
+
+@dataclass(frozen=True)
+class Turn:
+    role: Literal["user", "assistant"]
+    content: str
 
 
 def is_configured() -> bool:
@@ -130,3 +151,64 @@ def structured[T: BaseModel](
     if response.output_parsed is None:
         raise LLMError
     return response.output_parsed
+
+
+def stream_text(
+    prompt: Prompt,
+    context: str,
+    turns: Sequence[Turn],
+    *,
+    db: Session,
+    user_id: int,
+    max_output_tokens: int = 2000,
+) -> Iterator[str]:
+    """A chat reply, streamed as text deltas.
+
+    `context` (the data the reply may use) is appended to the instructions; `turns` is the
+    conversation, ending with the user's new message. Configuration, the daily cap and the
+    request itself are checked before this returns, so the caller can still answer with an
+    error status; failures after that surface as LLMError while iterating.
+    """
+    settings = get_settings()
+    if not settings.openai_api_key:
+        raise LLMNotConfiguredError
+    _take_quota(db, user_id)
+    client = _client(settings.openai_api_key, settings.openai_timeout_seconds)
+    effort = settings.openai_reasoning_effort
+    messages: list[EasyInputMessageParam] = [
+        {"role": turn.role, "content": turn.content} for turn in turns
+    ]
+    try:
+        stream = client.responses.create(
+            model=settings.openai_model,
+            instructions=f"{prompt.text}\n\n{context}",
+            input=messages,  # type: ignore[arg-type]
+            reasoning={"effort": effort} if effort else openai.omit,  # type: ignore[typeddict-item]
+            max_output_tokens=max_output_tokens,
+            store=False,
+            stream=True,
+        )
+    except openai.OpenAIError as exc:
+        logger.warning(
+            "LLM stream %s@%s failed: %s", prompt.name, prompt.version, type(exc).__name__
+        )
+        raise LLMError from exc
+    return _deltas(stream, prompt)
+
+
+def _deltas(stream: openai.Stream[Any], prompt: Prompt) -> Iterator[str]:
+    try:
+        with stream:
+            for event in stream:
+                if event.type == "response.output_text.delta":
+                    yield event.delta
+                elif event.type in ("error", "response.failed"):
+                    raise LLMError(event.type)
+                elif event.type == "response.incomplete":
+                    # Out of output tokens: keep what was written rather than fail the reply.
+                    logger.info("LLM stream %s@%s ended incomplete", prompt.name, prompt.version)
+    except openai.OpenAIError as exc:
+        logger.warning(
+            "LLM stream %s@%s broke: %s", prompt.name, prompt.version, type(exc).__name__
+        )
+        raise LLMError from exc

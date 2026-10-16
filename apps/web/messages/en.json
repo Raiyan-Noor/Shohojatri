@@ -24,7 +24,8 @@
       "sharedReport": "Shared report",
       "screeningDemo": "Demo games",
       "settings": "Settings",
-      "offline": "Offline"
+      "offline": "Offline",
+      "resultsChat": "Questions about the result"
     }
   },
   "common": {
@@ -50,7 +51,6 @@
     "demo": "Demo"
   },
   "landing": {
-    "promise": "From the first worry to the long journey — always beside your child",
     "start": "Get started",
     "haveAccount": "Already have an account?",
     "login": "Log in"
@@ -596,7 +596,10 @@
     "length_required": "We couldn't send this game's measurements. Please try again.",
     "share_not_found": "We couldn't find this report. Check the link.",
     "share_revoked": "This link has been closed by the parent.",
-    "share_expired": "This link has closed."
+    "share_expired": "This link has closed.",
+    "ai_not_configured": "The AI helper isn't switched on right now. Your report is safe.",
+    "ai_quota_exceeded": "You've reached today's limit for questions. Please ask again tomorrow.",
+    "ai_unavailable": "We couldn't get an answer just now. Your question is still in the box: please try again in a moment."
   },
   "demo": {
     "profiles": {
@@ -700,6 +703,30 @@
     },
     "reportNo": "Shohojatri screening · Report no. {no}",
     "demoBanner": "Demo: the games were replayed from a recorded sample session, not measured from {name}."
+  },
+  "resultsChat": {
+    "back": "Back to the result",
+    "title": "Questions about the result",
+    "subtitle": "{name}'s report · {date}",
+    "banner": "I help you understand the report. This is not a diagnosis: make decisions about care together with a doctor.",
+    "intro": "Ask me anything about {name}'s report. I answer only from this screening.",
+    "thinking": "Looking at the report…",
+    "retry": "Try again",
+    "suggest": "You could ask",
+    "suggestMore": "You could also ask",
+    "suggestions": {
+      "meaning": "What does this result mean?",
+      "next": "What should I do now?",
+      "doctor": "What should I ask the doctor?",
+      "play": "What can we play at home?"
+    },
+    "inputLabel": "Your question",
+    "placeholder": "Type your question…",
+    "send": "Send",
+    "unavailable": {
+      "title": "Questions aren't available right now",
+      "message": "The AI helper isn't switched on at the moment. Your report is safe, and you can still share it with a doctor."
+    }
   },
   "findings": {
     "rtn": {

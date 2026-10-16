@@ -22,6 +22,7 @@ Not designed: landing, `/share/[token]` recipient view (+ expired/revoked), `/te
 B4 uses `llm.py` + `answer_mapper.md` for "Other" answers (SCREENING §3.3); B8 is where `llm.py` is built.
 **Default:** Minimal `llm.py` in B4 (client, JSON-output helper, "AI not configured" fallback, model names from env, confirmed against OpenAI docs). B8 adds SSE streaming and `safety.md`. · B4, B8
 *B4:* built as described (Responses API structured outputs, `store=False`, prompt files with a `version` front-matter header). Streaming, `safety.md` and embeddings (`OPENAI_EMBED_MODEL`) remain for B8.
+*B8:* `stream_text` (Responses API streaming, checked before the first byte so errors are plain JSON), `with_safety` and `safety.md` added. Embeddings move to B11, where retrieval needs them.
 
 ### 6. ~~Confidence rules overlap~~ Resolved in B5
 The default was adopted and is now SCREENING_SPEC §6.4.
@@ -46,6 +47,7 @@ SCREENING §7 says a parent can share with an on-platform specialist "in-app (gr
 **Default:** Child IDs exist for every child, whatever their status. "Share in-app" = the parent picks a Shohojatri specialist (from the directory) and sends an invite, which creates a normal child-level `clinical` grant once the specialist accepts. No per-screening grants. · B3, B7, B8
 *B3:* the first half is built (every child has a Child ID and can receive requests, in COMPANION_SPEC §2). The parent-initiated invite is still open for B7/B8.
 *B7:* sharing is by link only (SCREENING_SPEC §7). The in-app invite needs the specialist directory, so it moves to B8.
+*B8:* the specialist directory and "Find specialists" were dropped from B8 by decision, so the in-app invite stays open (no phase owns it now).
 
 ### 11. What "private" log visibility means
 COMPANION §3.2 shows `private` as "author only (+ parent always)" in the parent column and "author only" for others. That reads as: a teacher's private note is still visible to the parent.

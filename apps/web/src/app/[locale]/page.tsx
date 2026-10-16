@@ -31,16 +31,15 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         <LanguageToggle />
       </header>
       <main className="mx-auto flex w-full max-w-(--reading-max) flex-1 flex-col items-center justify-center gap-6 px-8 text-center">
-        <Image
-          src={logo.src}
-          alt={tCommon("appName")}
-          width={logo.width}
-          height={logo.height}
-          priority
-          className="h-auto w-[230px]"
-        />
-        <h1 className="m-0 font-display text-h2 font-semibold text-balance text-navy">
-          {t("promise")}
+        <h1 className="m-0">
+          <Image
+            src={logo.src}
+            alt={tCommon("appName")}
+            width={logo.width}
+            height={logo.height}
+            priority
+            className="h-auto w-[230px]"
+          />
         </h1>
       </main>
       <div className="mx-auto flex w-full max-w-(--reading-max) flex-col gap-2 px-5 pt-3 pb-7">

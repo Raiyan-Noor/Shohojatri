@@ -15,6 +15,7 @@ from app.routers import (
     meta,
     notifications,
     reports,
+    results_chat,
     screenings,
 )
 from app.schemas.errors import ErrorResponse
@@ -54,6 +55,7 @@ def create_app() -> FastAPI:
         notifications.router,
         screenings.router,
         reports.router,
+        results_chat.router,
         demo.router,
     ):
         api.include_router(router)

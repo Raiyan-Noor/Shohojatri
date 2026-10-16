@@ -28,6 +28,7 @@ export const TASK_GAME = {
 export const LOW_LIGHT_LUMA = 60;
 
 export const resultPath = (screeningId: number) => `/screening/${screeningId}/result`;
+export const resultsChatPath = (screeningId: number) => `/screening/${screeningId}/chat`;
 export const parentReportPath = (screeningId: number) => `/screenings/${screeningId}/report`;
 export const clinicianReportPath = (screeningId: number) => `/screenings/${screeningId}/clinician`;
 export const sharePath = (token: string) => `/share/${token}`;

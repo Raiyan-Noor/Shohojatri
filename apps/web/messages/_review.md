@@ -62,3 +62,10 @@ Strings a native speaker should check for natural, simple spoken register (CLAUD
 - // TODO(bn-review) `pwa.install.title` — "ফোনে অ্যাপ হিসেবে রাখুন" for "Add Shohojatri to your phone"
 - // TODO(bn-review) `pwa.install.iosSteps` — keeps Safari's menu item “Add to Home Screen” in English (iOS has no Bangla UI); check the description of the Share icon
 - // TODO(bn-review) `meta.pages.offline` / `offline.title` — "ইন্টারনেট নেই" / "ইন্টারনেট সংযোগ নেই"
+
+### B8 — results chat
+
+- // TODO(bn-review) `resultsChat.banner` — "আমি রিপোর্টটা বুঝতে সাহায্য করি — এটি রোগনির্ণয় নয়।" (from the design's C1 frame, lightly edited)
+- // TODO(bn-review) `resultsChat.intro` — "আমি শুধু এই স্ক্রিনিংয়ের তথ্য দেখে উত্তর দিই"
+- // TODO(bn-review) `errors.ai_unavailable` — "আপনার প্রশ্নটা বক্সেই আছে" for "your question is still in the box"
+- // TODO(bn-review) The model's Bangla replies: `results_explainer.md` asks for simple spoken Bangla and "আপনার সন্তান/বাচ্চা"; check real replies with a native speaker before a pilot.

@@ -34,6 +34,22 @@ async function fetchWithRefresh(request: Request): Promise<Response> {
   return (await refreshSession()) ? fetch(retry) : response;
 }
 
+/** Raw `fetch` to the API with the same refresh-and-retry, for responses openapi-fetch can't
+ *  parse (streams). Throws ApiRequestError when the server can't be reached or answers non-2xx. */
+export async function apiFetch(path: `/api/v1/${string}`, init: RequestInit): Promise<Response> {
+  let response: Response;
+  try {
+    response = await fetchWithRefresh(new Request(path, init));
+  } catch {
+    throw new ApiRequestError(null, null);
+  }
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => null);
+    throw new ApiRequestError(response.status, asErrorResponse(body));
+  }
+  return response;
+}
+
 // Relative URLs: requests go to this origin and next.config.ts rewrites /api/v1/* to FastAPI,
 // so the httpOnly auth cookies stay first-party. Browser-only: server components would need
 // an absolute base URL and the user's cookies.
