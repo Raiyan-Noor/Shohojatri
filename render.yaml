@@ -5,8 +5,9 @@ services:
     name: shohojatri-api
     runtime: docker
     region: singapore
-    # Paid instances don't sleep; on `free` the first request after 15 idle minutes takes ~1 min.
-    plan: 0.5c-512mb
+    # Free: sleeps after 15 idle minutes, and the next request takes about a minute to wake it.
+    # Open the site a few minutes before a pitch. Paid (e.g. 0.5c-512mb) never sleeps.
+    plan: free
     dockerfilePath: ./apps/api/Dockerfile
     dockerContext: ./apps/api
     healthCheckPath: /api/v1/health
@@ -51,7 +52,8 @@ services:
 databases:
   - name: shohojatri-db
     region: singapore
-    plan: 0.1c-256mb
+    # Free: 1 GB, and Render deletes it 30 days after creation unless upgraded (e.g. 0.1c-256mb).
+    plan: free
     postgresMajorVersion: "17"
     databaseName: shohojatri
     user: shohojatri

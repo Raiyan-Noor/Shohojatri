@@ -167,7 +167,7 @@ Signs the scorer relies on (the browser normalises to them): `yaw` > 0 when the 
   - `noise_db` is the 20th percentile of the task's 50-ms RMS readings: the room under any talking.
 - **Upload `device`:** camera front/rear as reported by the track (a laptop's single camera counts as front), `device_type` from the setup check, video size, frames per second achieved, and the user agent.
 - **Audio events:** YAMNet's top 3 classes per 1-s window, sent for every task (only free play uses them).
-- **Model downloads:** WASM is served by the app; models come from Google's model storage (`NEXT_PUBLIC_MEDIAPIPE_MODEL_BASE` overrides it).
+- **Model downloads:** WASM and models are self-hosted by the web app under `/models/<mediapipe-version>/` (fetched and hash-checked at build time; cached for a year, and cache-first in the service worker). They are prefetched in the background while the parent answers the questionnaire, unless the browser asks to save data.
 
 ### 4.2 Setup check (≈ 30 s)
 

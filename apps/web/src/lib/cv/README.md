@@ -21,8 +21,12 @@ SCREENING_SPEC §4.1. The browser turns camera and microphone input into numbers
 
 ## Models and WASM
 
-- **WASM** is served from `public/mediapipe/{vision,audio}`. `scripts/copy-mediapipe.mjs` copies it from `node_modules` before `pnpm dev` / `pnpm build`, so the JS and WASM versions always match. The folder is git-ignored.
-- **Models** (`face_landmarker`, `pose_landmarker_lite`, `yamnet`) download from Google's model storage. To self-host them, set `NEXT_PUBLIC_MEDIAPIPE_MODEL_BASE` to a folder with the same layout.
+- **Everything is self-hosted** under `public/models/<key>/` (git-ignored). `<key>` (e.g. `mp-v1.1.1-a1.1.1`) carries both MediaPipe package versions, so the files are served with a one-year `immutable` cache header and an upgrade simply gets new URLs. The list lives in `scripts/mediapipe-assets.mjs`.
+- `scripts/prepare-models.mjs` runs before `pnpm dev` / `pnpm build`:
+  - **WASM:** copies `*_wasm_internal` and `*_wasm_nosimd_internal` from `node_modules`, so the JS and WASM versions always match. The unused `_module_` variants are skipped.
+  - **Models** (`face_landmarker`, `pose_landmarker_lite`, `yamnet`): downloaded once from Google's model storage and checked against pinned SHA-256 hashes. A file already present with the right hash is kept.
+- **Service worker:** caches `/models/*` cache-first (`src/sw/sw.ts`).
+- **Prefetch:** `prefetch.ts` downloads the SIMD set one file at a time while the parent is on the questionnaire (skipped for demo screenings and with Save-Data on), so the games start without a wait.
 - **Face landmarker:** `numFaces: 2`, with blendshapes and transformation matrices.
 - **Pose landmarker:** `numPoses: 2`. The child's body is the one nearest the child's face, else the narrowest.
 - Pose runs only during Copy me and Free play.

@@ -1,5 +1,107 @@
 # Changelog
 
+## Deploy — first public deployment (pitch demo) (2026-10-17)
+
+Readies the app for Render (API + Postgres, Singapore) and Vercel (web, `sin1`) before the companion module. No feature changes. Steps: `docs/DEPLOY.md`.
+
+### API
+- **Production settings:**
+  - `ENV=production` refuses to start unless `DATABASE_URL` is Postgres, `JWT_SECRET` has ≥ 32 characters, `OPENAI_API_KEY` and `OPENAI_MODEL` are set, and `PUBLIC_WEB_URL` is https. The error names every missing variable.
+  - In production, cookies are always `Secure` (plus `HttpOnly`, `SameSite=Lax`, no `Domain`), and `CORS_ORIGINS` defaults to `PUBLIC_WEB_URL`.
+  - `postgres://` / `postgresql://` URLs are switched to the psycopg 3 driver (`psycopg[binary]`, new dependency).
+- **Docker:**
+  - `scripts/start.sh` runs `alembic upgrade head`, seeds only when `SEED_DEMO=true` (the seed was already idempotent), then starts uvicorn on `$PORT` with 2 workers and `--proxy-headers --forwarded-allow-ips "*"`.
+  - `.gitattributes` keeps `*.sh` LF in Windows checkouts.
+  - docker-compose sets `SEED_DEMO=true`.
+- **Postgres:**
+  - All 5 migrations upgrade, downgrade to base and re-upgrade on Postgres 17, and `alembic check` reports no drift.
+  - No SQLite-only types or defaults were found: enums are non-native, JSON is portable, and there are no server defaults.
+- **`GET /api/v1/client-config`** (public) returns `PUBLIC_WEB_URL`. The web app builds share links and the Child ID QR from it, falling back to its own origin in development.
+- **Abuse protection** (new tables `rate_limit_hits`, `llm_usage`; migration `ad5926811e52`). Counts live in the database, so they hold across workers.
+  - **Login:** 30 attempts per IP per 15 min, and 10 wrong passwords per account per 15 min. Successful logins don't count against the account, so a room can share `parent@demo.bd`.
+  - **Sign-up:** 10 per IP per hour. Over the limit: 429 `rate_limited` with `retry_after`.
+  - **Storage:** keys are SHA-256 hashes, never raw IPs or identifiers.
+  - **LLM cap:** `LLM_DAILY_CAP` (default 50) calls per user per Bangladesh day, enforced in `ai/llm.py` with an atomic increment. Past it, `LLMQuotaExceededError` (an `LLMError`) makes callers fall back, and the "Other" answer asks the parent to pick a card.
+  - **Uploads:** the task upload limit stays at 5 MB.
+- **`render.yaml`:**
+  - Docker web service in Singapore, health check `/api/v1/health`, a build filter on `apps/api/**`;
+  - Postgres 17 with no public access;
+  - both on Render's free plans (sleep after 15 idle minutes; the free database expires after 30 days; see DEPLOY.md);
+  - `JWT_SECRET` generated, `OPENAI_API_KEY` / `PUBLIC_WEB_URL` as `sync: false`.
+- **Tests:** 719 pass.
+  - `test_production.py`: fail-fast for each variable, URL normalisation, Secure cookie attributes, client-config.
+  - `test_rate_limits.py`: per-account failures, per-IP, window expiry, sign-up, hashed keys.
+  - `test_llm_quota.py`: cap, per user, next day, 0 = off.
+  - The conftest turns the auth limits off for the rest of the suite.
+
+### Web
+- **API proxy:** `API_ORIGIN` (renamed from `API_INTERNAL_URL` in next.config, Dockerfile, compose and `.env.example`) is the `/api/v1/*` rewrite target. The client already used relative URLs.
+- **MediaPipe self-hosted:**
+  - `scripts/prepare-models.mjs` (replaces `copy-mediapipe.mjs`) copies the used WASM pairs and downloads the 3 models, checked by SHA-256, into `public/models/mp-v<vision>-a<audio>/`. The versioned path is served `max-age=31536000, immutable`.
+  - `NEXT_PUBLIC_MEDIAPIPE_MODEL_BASE` is gone.
+- **Search engines and demo notice:**
+  - `noindex, nofollow` in a meta tag and an `X-Robots-Tag` header.
+  - A dismissible bn/en demo banner on every page, remembered in localStorage and guarded for blocked storage.
+- **`vercel.json`:** `regions: ["sin1"]`.
+- **PWA:**
+  - `manifest.webmanifest`: name "সহযাত্রী (Shohojatri)", start `/bn`, standalone, theme `#004E8B`.
+  - Icons: 192/512/maskable-512 and the apple-touch-icon. `scripts/make_icons.py` generates them from `logo_shoho.png`'s figure; the wordmark is unreadable at icon size, so it is cropped out.
+  - iOS tags: `apple-mobile-web-app-capable` and the touch icon.
+- **Service worker:** Serwist 9.5 with `@serwist/turbopack` (Next 16 builds with Turbopack). Dev dependencies: `@serwist/turbopack`, `serwist`, `esbuild`; esbuild added to pnpm's `allowBuilds`.
+  - Source `src/sw/sw.ts` with its own webworker tsconfig (`pnpm typecheck` checks both), served at `/serwist/sw.js`.
+  - **Precache:** the app shell (Next static JS/CSS/fonts, brand images, icons) and `/bn|en/offline`.
+  - **Models:** `/models/*` is cache-first; old versions are dropped on activate.
+  - **`/api/*`:** network-only, ahead of Serwist's defaults, which would otherwise cache API GETs.
+  - **Offline:** document requests fall back to the offline page in the URL's language.
+  - **Disabled in `next dev`.** It never reloads on reconnect, which would cut a game short.
+- **Install prompt** on the parent home:
+  - Chrome's `beforeinstallprompt` is caught app-wide and offered as "Install app".
+  - iPhone shows the Share → Add to Home Screen steps.
+  - Hidden when installed or dismissed.
+- **Phones:**
+  - **Prefetch:** the models download in the background on the questionnaire (one at a time, low priority; skipped for demo screenings and Save-Data).
+  - **"Call now":** flashes the screen once where `navigator.vibrate` isn't available (iPhone).
+  - **Already in place since B6 (no change):** the wake lock during the games, and camera/mic starting only from a tap.
+- **Strings:** bn + en for `demoBanner`, `offline`, `pwa.install`, `meta.pages.offline`. Uncertain Bangla is in `_review.md`.
+
+### Docs and tools
+- `docs/DEPLOY.md` (Render Blueprint, Vercel, address fix-up, seeding, redeploy, limits).
+- `scripts/smoke_test.py <base-url>`, standard library only:
+  1. health and login;
+  2. a demo screening (questionnaire + 6 replayed tasks), then finalize;
+  3. both reports;
+  4. a share link opened without cookies;
+  5. cleanup.
+- Updated: CLAUDE.md (tree, commands, LLM cap), SCREENING_SPEC §4.1 (model downloads), `lib/cv/README.md`.
+
+### Verified
+- **API:** `ruff check`, `ruff format --check`, `pytest` (719 passed).
+- **Web:** `pnpm lint`, `pnpm typecheck` (app + service worker), prettier, `pnpm test:cv` (8 passed), `pnpm build`.
+- **Docker image on Postgres 17** (scratch containers, removed afterwards):
+  - With `ENV=production` and missing variables, the container exits and names them.
+  - With a full production config:
+    - migrations, then the seed (5 accounts, 2 children; 0 on a second start);
+    - 2 workers on `$PORT`, `/health` ok, `client-config` returns `PUBLIC_WEB_URL`;
+    - login cookies `HttpOnly; SameSite=lax; Secure` with no `Domain`.
+  - The per-IP limit returned 429 on the 31st login from one forwarded address, and 200 for a different one.
+- **Smoke test passed twice on Postgres:**
+  - directly against the API;
+  - through `next start` and its `/api/v1` rewrite.
+- **In Chrome against the production build:**
+  - the service worker is active and controlling, with 82 precached entries;
+  - all 7 MediaPipe files landed in the model cache while question 1 was open;
+  - no `/api` response appeared in any cache;
+  - banner and install card render on the parent home;
+  - with the server stopped, an unvisited `/en/...` page showed the styled English offline page.
+
+  The service worker and caches were unregistered afterwards, so `:3011` is clean for dev.
+- **Not verified:**
+  - an actual Render or Vercel deploy (no accounts from here);
+  - Android install and vibration, iPhone Add to Home Screen and the flash;
+  - the wake lock on a real phone;
+  - `docker compose up --build` of the web image.
+  - **Whether Vercel forwards the client IP in `X-Forwarded-For` on external rewrites.** If it doesn't, every visitor shares Vercel's address for the per-IP limit. Watch for unexpected 429s after deploying.
+
 ## B6 — Browser capture, setup check, calibration, activities (2026-10-17)
 
 SCREENING_SPEC §4.1–§4.8 in the browser. The camera games now run end to end on top of B7's upload, skip and finalize endpoints. No API changes.
