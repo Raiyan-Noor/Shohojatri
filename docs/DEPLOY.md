@@ -76,13 +76,12 @@ Fix it under **Environment**, then save. Saving redeploys.
    - **Project Name**: the name you picked (e.g. `shohojatri`).
    - **Framework Preset**: Next.js (detected).
    - **Root Directory**: click **Edit**, choose `apps/web`, then **Continue**.
-   - **Build and Output Settings**: leave the defaults. `pnpm build` downloads and checks the MediaPipe models and copies the WASM into `public/models`.
-   - **Environment Variables**: add both of these for Production *and* Preview.
+   - **Build and Output Settings**: leave the defaults, with no overrides. `apps/web/vercel.json` sets the install and build commands to pnpm 12.11.2 (the version in `package.json`'s `packageManager`; keep the two in sync). Vercel's own pnpm detection only reads the repository root, which has no `package.json`, and older pnpm versions can't read this lockfile. `pnpm build` downloads and checks the MediaPipe models and copies the WASM into `public/models`.
+   - **Environment Variables**: add this for Production *and* Preview.
 
      | Name | Value |
      |---|---|
      | `API_ORIGIN` | the Render address from step 1.8, e.g. `https://shohojatri-api.onrender.com` (no trailing slash) |
-     | `ENABLE_EXPERIMENTAL_COREPACK` | `1` (makes Vercel use the exact pnpm version in `package.json`) |
 4. Click **Deploy** (about 2–4 min). `vercel.json` puts the functions in `sin1` (Singapore), next to the API.
 5. Open the deployment's address. It should redirect to `/bn` and show the demo banner.
 
