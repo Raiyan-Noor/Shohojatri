@@ -92,6 +92,10 @@ No cap: the POC's users are competition judges, so cost abuse isn't a concern. T
 An approved specialist may read a child's screening reports (COMPANION_SPEC §3.2), and `/screenings/[id]/clinician` lets them in, but nothing in the specialist's UI links there yet: their home lists children without screenings, and the child dashboard is B13.
 **Default:** B13's child dashboard (Overview / Progress "screening history") lists finalized screenings with links to the doctor report for clinical members. Until then a parent shares a link. · B13
 
+### 19. Characteristics sections: design vs spec
+The design's profile wizard (Companion W3) lists 10 different sections (communication & language, social, play, senses, routine & change, emotions & calming, sleep, food, movement & hands, strengths) with different questions (e.g. "how many words", "responds to name") than COMPANION_SPEC §4.
+**Default:** Follow the spec's 10 sections and questions (spec wins), laid out as the design shows them (list W3a, one section per screen W3b/W3c). If the design's version is preferred, change §4 first; only `seed/characteristics.yaml` changes. · B9, B14
+
 ### 20. Which words in a chat message count as urgent?
 The companion chat shows the "talk to a doctor now / call 999" card when the user's message matches a keyword list (`URGENT_PATTERNS` in `apps/api/app/ai/companion_chat.py`, bn + en: seizure/খিঁচুনি, breathing/শ্বাস, injury/আঘাত, self-injury, unconscious/অজ্ঞান, not drinking/পানি খাচ্ছে না, sudden loss of skills/হঠাৎ…ভুলে যাচ্ছে, abuse/নির্যাতন), or when the reply mentions 999. The list errs towards false alarms ("শ্বাস" also matches calming breathing exercises), and descriptions without a keyword ("hands and legs shook, eyes rolled back") rely on the model writing 999.
 **Default:** keep the cautious list; a clinician reviews it, plus real Bangla phrasings parents use, before the pilot. · B11

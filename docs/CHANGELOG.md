@@ -51,7 +51,7 @@ A simple first version of the companion chatbot (COMPANION_SPEC §13), ahead of 
 - `scripts/try_chat.py` asks 8 sample questions (bn + en) as the seeded parent, teacher and doctor, and prints answers, sources, the urgent flag and timings.
 
 ### Verified
-- **API:** `ruff check`, `ruff format --check`, full `pytest`.
+- **API:** `ruff check`, `ruff format --check`, full `pytest` (834 passed, with B9).
 - **Web:** `pnpm typecheck`, `pnpm lint`, prettier.
 - **Scratch run:** API on :8021 with a fake streaming LLM (no OpenAI key here) and a seeded SQLite DB, `next dev` on :3021.
   - Through the Next rewrite, the reply arrived in 11 chunks over 0.3 s (not buffered), `meta` first.
