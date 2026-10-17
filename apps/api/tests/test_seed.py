@@ -75,3 +75,39 @@ def test_demo_children_and_rafis_care_team(db: Session, client: TestClient) -> N
     login_as("teacher2@demo.bd")
     assert client.get("/api/v1/children").json() == []
     assert [r["status"] for r in client.get("/api/v1/access-requests").json()] == ["pending"]
+
+
+def test_rafis_companion_record(db: Session, client: TestClient) -> None:
+    from app.core.characteristics import load_characteristics, validate_section
+    from app.seed.companion import CHARACTERISTICS, seed_companion
+
+    seed_users(db)
+    seed_children(db)
+    created = seed_companion(db)
+    assert created > 30
+    assert seed_companion(db) == 0
+
+    # The demo answers pass the same validation a parent's would, unchanged.
+    for section in load_characteristics().sections:
+        assert validate_section(section, CHARACTERISTICS[section.id]) == CHARACTERISTICS[section.id]
+
+    def login_as(email: str) -> None:
+        client.post("/api/v1/auth/login", json={"identifier": email, "password": DEMO_PASSWORD})
+
+    login_as("parent@demo.bd")
+    [rafi] = [c for c in client.get("/api/v1/children").json() if c["name"] == "Rafi"]
+    assert rafi["diagnosis"]["kind"] == "autism"
+    assert rafi["characteristics_done"] == rafi["characteristics_total"] == 10
+    parent_view = client.get(f"/api/v1/children/{rafi['id']}/logs", params={"limit": 50}).json()
+    assert len(parent_view["items"]) == created
+    # The two newest professional entries, plus teacher2's pending join request.
+    assert client.get("/api/v1/notifications").json()["unread"] == 3
+    assert len(client.get(f"/api/v1/children/{rafi['id']}/goals").json()) == 3
+
+    login_as("teacher@demo.bd")
+    [card] = client.get("/api/v1/children").json()
+    assert card["new_logs"] > 0
+    teacher_view = client.get(f"/api/v1/children/{rafi['id']}/logs", params={"limit": 50}).json()
+    # The doctor's clinical notes stay out of the teacher's timeline.
+    assert 0 < len(teacher_view["items"]) < created
+    assert all(item["visibility"] == "care_team" for item in teacher_view["items"])

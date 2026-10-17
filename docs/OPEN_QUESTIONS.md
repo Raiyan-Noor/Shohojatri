@@ -12,6 +12,7 @@ Handoff tokens and fonts are used from B1; CLAUDE.md §7/§8 updated.
 ### 2. Route map: design's map vs. PROMPTS/CLAUDE.md
 Design routes use singular `/screening/new`, `/screening/[id]/…` for the flow and plural `/screenings/[id]/report|clinician` for reports (spec §7 agrees on the plural report routes). It also adds routes that no phase owns: `/children/new?step=`, `/reminders`, `/children/[id]/activities/[activityId]`, `/children/[id]/reports/[reportId]`, quick-log as a sheet (`?log=new`).
 **Default:** Adopt the design's map verbatim, extra routes included, so B14 needs no route changes. Mixed singular/plural is cosmetic. · B4, B7, B9, B11, B12
+*B9:* the wizard is `/children/[id]/activate?step=diagnosis|traits|section|team|done` (`&section=` for one part), so it serves a screened child and a new one alike; `/children/new?companion=1` creates the child first and continues there. Quick log is a sheet with no route. Extra B9 routes: `/children/[id]/profile` (+ `/profile/edit?section=`), `/children/[id]/logs/new` (`?corrects=`), `/children/[id]/logs/[logId]/edit`.
 
 ### 3. Screens with no design, and missing English copy
 Not designed: landing, `/share/[token]` recipient view (+ expired/revoked), `/teacher`, `/specialist`, `/admin`, clinician web view. Screening Flow, Results, Companion and Parent Report frames are Bangla-only.
@@ -41,6 +42,7 @@ T2 ("দেখো!"), T3 ("এভাবে করো!", "এত্ত বড়!
 ### 9. Monthly check-ins: seeded but not built
 CLAUDE.md §10 requires Rafi's seed to include two monthly check-ins; COMPANION §10 and B13 call the feature a stretch. It's also unclear whether teachers see check-ins: they are `check_in` logs (visible to teachers via `care_team`) but are re-runs of screening tasks (screening results are hidden from teachers per §3.2).
 **Default:** Seed check-ins as `check_in` logs with metrics and plot them on Progress; the check-in runner stays a stretch. Check-in logs default to `clinical` visibility, and the parent can change it per entry. · B9, B13
+*B9:* not seeded yet. A `check_in` log needs somewhere to keep its metrics, which belongs with the Progress tab (B13), so the two seeded check-ins move to B13. The API already refuses `check_in` from users (only the app writes them).
 
 ### 10. Specialist access to a screening, and requests for screening-only children
 SCREENING §7 says a parent can share with an on-platform specialist "in-app (grants access to that screening via the normal access flow)". But the normal flow is requester-initiated and grants are child-level, not per screening. Also unspecified: can access be requested for a child still in `screening` status?
@@ -52,6 +54,7 @@ SCREENING §7 says a parent can share with an on-platform specialist "in-app (gr
 ### 11. What "private" log visibility means
 COMPANION §3.2 shows `private` as "author only (+ parent always)" in the parent column and "author only" for others. That reads as: a teacher's private note is still visible to the parent.
 **Default:** `private` = author + the child's parent. The UI labels it "Only you and the parent" for non-parents and "Only me" for the parent's own entries. · B3, B9, B11
+*B9:* built as the default (`app/core/logs.py`, tested per role). The labels are worded neutrally so they read right to anyone: "Only the parent can see this" / "Only the writer and the parent can see this".
 
 ### 12. Sharing status reports across scopes
 COMPANION §13.5 says status reports are "shareable with the care team". A report a parent or specialist generates (full or clinical scope) would then reach teachers, which conflicts with §11.3 (teachers never receive clinical-derived text).
@@ -72,6 +75,7 @@ Not specified: whether demo-mode screenings (`is_demo`) appear in screening hist
 *B4:* `screenings.informant`, `screenings.parent_note` (plus `questionnaire_completed_at`) and `screening_answers.ai_mapping_json` added; COMPANION_SPEC §15 updated.
 *B7:* the calibration is a `screening_tasks` row (`task = "calibration"`), and `screening_tasks.demo` marks replayed uploads; COMPANION_SPEC §15 updated.
 *B3:* `can_add_logs` exists and the permission table checks it, but it is always true: the design's Care team (Companion B6) shows logs as "always on for every member", so there's no read-only toggle. Recorded in COMPANION_SPEC §3.2. The other items stay open for their phases.
+*B9:* `log_versions` built (one row per edit, with the content before it); COMPANION_SPEC §15 updated. `documents.visibility` stays open for B10.
 
 ### 15. ~~Sign-up by phone, verification, password reset~~ Resolved in B2
 Email or phone login, no OTP, admin-issued temporary passwords. Now in COMPANION_SPEC §3.1 ("Accounts and passwords").
@@ -87,6 +91,10 @@ No cap: the POC's users are competition judges, so cost abuse isn't a concern. T
 ### 18. How a specialist reaches a screening report
 An approved specialist may read a child's screening reports (COMPANION_SPEC §3.2), and `/screenings/[id]/clinician` lets them in, but nothing in the specialist's UI links there yet: their home lists children without screenings, and the child dashboard is B13.
 **Default:** B13's child dashboard (Overview / Progress "screening history") lists finalized screenings with links to the doctor report for clinical members. Until then a parent shares a link. · B13
+
+### 20. Which words in a chat message count as urgent?
+The companion chat shows the "talk to a doctor now / call 999" card when the user's message matches a keyword list (`URGENT_PATTERNS` in `apps/api/app/ai/companion_chat.py`, bn + en: seizure/খিঁচুনি, breathing/শ্বাস, injury/আঘাত, self-injury, unconscious/অজ্ঞান, not drinking/পানি খাচ্ছে না, sudden loss of skills/হঠাৎ…ভুলে যাচ্ছে, abuse/নির্যাতন), or when the reply mentions 999. The list errs towards false alarms ("শ্বাস" also matches calming breathing exercises), and descriptions without a keyword ("hands and legs shook, eyes rolled back") rely on the model writing 999.
+**Default:** keep the cautious list; a clinician reviews it, plus real Bangla phrasings parents use, before the pilot. · B11
 ---
 
 **Decided without asking** (noted for the record, not open):

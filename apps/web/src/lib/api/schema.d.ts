@@ -405,6 +405,161 @@ export interface paths {
         patch: operations["updateGrant"];
         trace?: never;
     };
+    "/api/v1/children/{child_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Activate
+         * @description Saves the diagnosis details and makes the record a companion profile. Called again to
+         *     change the details later. Nothing from screening is touched (§1).
+         */
+        post: operations["activateCompanion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/characteristics/questionnaire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Questionnaire */
+        get: operations["getCharacteristicsQuestionnaire"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/children/{child_id}/characteristics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Characteristics */
+        get: operations["getCharacteristics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/children/{child_id}/characteristics/sections/{section_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save Section
+         * @description Saves one section (one wizard screen). A change makes a new version; saving the same
+         *     answers again doesn't.
+         */
+        put: operations["saveCharacteristicsSection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/children/{child_id}/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Goals */
+        get: operations["listGoals"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/children/{child_id}/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Logs
+         * @description Newest first. Opening the first page counts as "seen" for a member's "N new" badge.
+         */
+        get: operations["listLogs"];
+        put?: never;
+        /** Create Log */
+        post: operations["createLog"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/logs/{log_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Log */
+        get: operations["getLog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Log
+         * @description The author's edit within 24 h. The previous content is kept as a version.
+         */
+        patch: operations["updateLog"];
+        trace?: never;
+    };
+    "/api/v1/logs/{log_id}/explain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Explain Log
+         * @description Rewrites a teacher's or specialist's entry in simple words for the parent. Not saved.
+         */
+        post: operations["explainLog"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications": {
         parameters: {
             query?: never;
@@ -753,6 +908,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/children/{child_id}/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask */
+        post: operations["askCompanionChat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/children/{child_id}/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Conversations
+         * @description The viewer's own companion conversations about this child, most recent first.
+         */
+        get: operations["listCompanionConversations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/conversations/{conversation_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Messages */
+        get: operations["listCompanionMessages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/children/{child_id}/chat/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Suggestions
+         * @description Starter questions for the empty chat, by the viewer's role (design Assistant Chat E).
+         */
+        get: operations["getCompanionChatSuggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/demo/screening-tasks/{fixture_task}": {
         parameters: {
             query?: never;
@@ -890,6 +1119,33 @@ export interface components {
             /** New Password */
             new_password: string;
         };
+        /**
+         * CharacteristicsOut
+         * @description The child's latest answers. Version 0 = nothing saved yet.
+         */
+        CharacteristicsOut: {
+            /** Version */
+            version: number;
+            /** Questionnaire Version */
+            questionnaire_version: string;
+            /** Sections */
+            sections: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /** Updated At */
+            updated_at: string | null;
+            /** Updated By */
+            updated_by: string | null;
+        };
+        /** CharacteristicsQuestionnaireOut */
+        CharacteristicsQuestionnaireOut: {
+            /** Version */
+            version: string;
+            /** Sections */
+            sections: components["schemas"]["SectionOut"][];
+        };
         /** ChatMessageOut */
         ChatMessageOut: {
             /** Id */
@@ -908,6 +1164,43 @@ export interface components {
          * @enum {string}
          */
         ChatRole: "user" | "assistant";
+        /**
+         * ChatSource
+         * @description A timeline entry a reply cited as [L<log_id>].
+         */
+        ChatSource: {
+            /** Log Id */
+            log_id: number;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            author_role: components["schemas"]["Role"];
+            /** Author Name */
+            author_name: string;
+            /** Snippet */
+            snippet: string;
+        };
+        /**
+         * ChatSuggestion
+         * @description A starter question. The web app words it from `key` (messages companionChat.suggestions).
+         */
+        ChatSuggestion: {
+            /** Key */
+            key: string;
+            /** Params */
+            params: {
+                [key: string]: string;
+            };
+        };
+        /** ChatSuggestionsOut */
+        ChatSuggestionsOut: {
+            /** Ai Available */
+            ai_available: boolean;
+            /** Suggestions */
+            suggestions: components["schemas"]["ChatSuggestion"][];
+        };
         /** ChildCode */
         ChildCode: {
             /** Code */
@@ -938,6 +1231,13 @@ export interface components {
             pending_requests: number;
             /** Member Since */
             member_since: string | null;
+            diagnosis: components["schemas"]["Diagnosis"] | null;
+            /** Characteristics Done */
+            characteristics_done: number;
+            /** Characteristics Total */
+            characteristics_total: number;
+            /** New Logs */
+            new_logs: number;
         };
         /**
          * ChildStatus
@@ -948,6 +1248,31 @@ export interface components {
         ClientConfig: {
             /** Public Web Url */
             public_web_url: string | null;
+        };
+        /** CompanionChatRequest */
+        CompanionChatRequest: {
+            /** Conversation Id */
+            conversation_id?: number | null;
+            /** Message */
+            message: string;
+            locale: components["schemas"]["Locale"];
+        };
+        /** CompanionMessageOut */
+        CompanionMessageOut: {
+            /** Id */
+            id: number;
+            role: components["schemas"]["ChatRole"];
+            /** Content */
+            content: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Sources */
+            sources: components["schemas"]["ChatSource"][];
+            /** Urgent */
+            urgent: boolean;
         };
         /** CompleteQuestionnaireRequest */
         CompleteQuestionnaireRequest: {
@@ -980,6 +1305,20 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** ConversationSummary */
+        ConversationSummary: {
+            /** Id */
+            id: number;
+            /** Title */
+            title: string;
+            /** Preview */
+            preview: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** CreateAccessRequest */
         CreateAccessRequest: {
             /** Child Code */
@@ -997,6 +1336,30 @@ export interface components {
              */
             dob: string;
             sex?: components["schemas"]["Sex"] | null;
+        };
+        /** CreateLogRequest */
+        CreateLogRequest: {
+            /** Occurred At */
+            occurred_at?: string | null;
+            /** Domains */
+            domains?: components["schemas"]["LogDomain"][];
+            /** Ratings */
+            ratings?: {
+                [key: string]: number;
+            };
+            /** Text */
+            text?: string | null;
+            /** Goal Id */
+            goal_id?: number | null;
+            goal_progress?: components["schemas"]["GoalProgress"] | null;
+            /** Mood */
+            mood?: number | null;
+            type: components["schemas"]["LogType"];
+            visibility?: components["schemas"]["LogVisibility"] | null;
+            /** Corrects Log Id */
+            corrects_log_id?: number | null;
+            /** Explains Log Id */
+            explains_log_id?: number | null;
         };
         /** CreateScreeningRequest */
         CreateScreeningRequest: {
@@ -1067,6 +1430,26 @@ export interface components {
             /** User Agent */
             user_agent?: string | null;
         };
+        /**
+         * Diagnosis
+         * @description Activation wizard step 1 (COMPANION_SPEC §1), stored in `children.diagnosis_json`.
+         */
+        Diagnosis: {
+            kind: components["schemas"]["DiagnosisKind"];
+            /** Condition Text */
+            condition_text?: string | null;
+            /** Diagnosed On */
+            diagnosed_on?: string | null;
+            /** Diagnosed By */
+            diagnosed_by?: string | null;
+            /** Diagnosed By User Id */
+            diagnosed_by_user_id?: number | null;
+        };
+        /**
+         * DiagnosisKind
+         * @enum {string}
+         */
+        DiagnosisKind: "autism" | "autism_plus" | "other_condition" | "being_assessed";
         /** ErrorBody */
         ErrorBody: {
             /** Code */
@@ -1089,6 +1472,10 @@ export interface components {
         ExcludedTask: {
             task: components["schemas"]["TaskName"];
             reason: components["schemas"]["InconclusiveReason"] | null;
+        };
+        /** ExplainRequest */
+        ExplainRequest: {
+            locale: components["schemas"]["Locale"];
         };
         /**
          * Finding
@@ -1152,6 +1539,29 @@ export interface components {
             /** Rms Db */
             rms_db?: number | null;
         };
+        /** GoalOut */
+        GoalOut: {
+            /** Id */
+            id: number;
+            /** Title */
+            title: string;
+            /** Domain */
+            domain: string;
+            set_by_role: components["schemas"]["Role"];
+            status: components["schemas"]["GoalStatus"];
+            /** Target Date */
+            target_date: string | null;
+        };
+        /**
+         * GoalProgress
+         * @enum {string}
+         */
+        GoalProgress: "no_progress" | "some" | "good" | "achieved";
+        /**
+         * GoalStatus
+         * @enum {string}
+         */
+        GoalStatus: "active" | "achieved" | "paused";
         /** Grant */
         Grant: {
             /** Id */
@@ -1317,11 +1727,118 @@ export interface components {
             /** Invalid Reason */
             invalid_reason: ("face_not_visible" | "not_attending" | "no_baseline" | "something_wrong") | null;
         };
+        /** LabelOut */
+        LabelOut: {
+            /** Id */
+            id: string;
+            /** En */
+            en: string;
+            /** Bn */
+            bn: string;
+        };
         /**
          * Locale
          * @enum {string}
          */
         Locale: "bn" | "en";
+        /** LogAuthor */
+        LogAuthor: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            role: components["schemas"]["Role"];
+        };
+        /**
+         * LogDomain
+         * @enum {string}
+         */
+        LogDomain: "communication" | "social" | "behaviour_emotions" | "sensory" | "daily_living" | "learning" | "motor" | "sleep" | "eating";
+        /**
+         * LogExplanation
+         * @description Not saved: the parent may keep it as their own note (COMPANION_SPEC §5.1).
+         */
+        LogExplanation: {
+            /** Summary */
+            summary: string;
+            /** At Home */
+            at_home: string;
+            /** Ask Next */
+            ask_next: string[];
+        };
+        /** LogGoal */
+        LogGoal: {
+            /** Id */
+            id: number;
+            /** Title */
+            title: string;
+        };
+        /** LogOut */
+        LogOut: {
+            /** Id */
+            id: number;
+            type: components["schemas"]["LogType"];
+            author: components["schemas"]["LogAuthor"];
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Domains */
+            domains: components["schemas"]["LogDomain"][];
+            /** Ratings */
+            ratings: {
+                [key: string]: number;
+            };
+            /** Text */
+            text: string | null;
+            goal: components["schemas"]["LogGoal"] | null;
+            goal_progress: components["schemas"]["GoalProgress"] | null;
+            /** Mood */
+            mood: number | null;
+            visibility: components["schemas"]["LogVisibility"];
+            /** Version */
+            version: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Edited At */
+            edited_at: string | null;
+            /** Corrects Log Id */
+            corrects_log_id: number | null;
+            /** Corrected By Log Id */
+            corrected_by_log_id: number | null;
+            /** Explains Log Id */
+            explains_log_id: number | null;
+            /** Can Edit */
+            can_edit: boolean;
+            /** Can Correct */
+            can_correct: boolean;
+            /**
+             * Editable Until
+             * Format: date-time
+             */
+            editable_until: string;
+        };
+        /** LogPage */
+        LogPage: {
+            /** Items */
+            items: components["schemas"]["LogOut"][];
+            /** Next Offset */
+            next_offset: number | null;
+        };
+        /**
+         * LogType
+         * @enum {string}
+         */
+        LogType: "observation" | "progress" | "concern" | "milestone" | "therapy_session" | "school_day" | "clinical_note" | "activity_done" | "check_in";
+        /**
+         * LogVisibility
+         * @enum {string}
+         */
+        LogVisibility: "care_team" | "clinical" | "private";
         /** LoginRequest */
         LoginRequest: {
             /** Identifier */
@@ -1387,7 +1904,7 @@ export interface components {
          * NotificationKind
          * @enum {string}
          */
-        NotificationKind: "access_request_received" | "access_request_approved" | "access_request_declined";
+        NotificationKind: "access_request_received" | "access_request_approved" | "access_request_declined" | "log_added" | "log_digest";
         /** NotificationList */
         NotificationList: {
             /** Items */
@@ -1423,6 +1940,13 @@ export interface components {
             /** Requester Name */
             requester_name?: string | null;
             requester_role?: components["schemas"]["Role"] | null;
+            /** Author Name */
+            author_name?: string | null;
+            author_role?: components["schemas"]["Role"] | null;
+            /** Log Id */
+            log_id?: number | null;
+            /** Count */
+            count?: number | null;
         };
         /** OkResponse */
         OkResponse: {
@@ -1555,6 +2079,29 @@ export interface components {
                 number
             ] | null;
         };
+        /** QuestionOut */
+        QuestionOut: {
+            /** Id */
+            id: string;
+            type: components["schemas"]["QuestionType"];
+            /** Text En */
+            text_en: string;
+            /** Text Bn */
+            text_bn: string;
+            /** Options */
+            options: components["schemas"]["LabelOut"][];
+            /** Rows */
+            rows: components["schemas"]["LabelOut"][];
+            /** Other */
+            other: boolean;
+            /** Max */
+            max: number | null;
+        };
+        /**
+         * QuestionType
+         * @enum {string}
+         */
+        QuestionType: "single" | "multi" | "grid" | "text" | "tags" | "list" | "therapies";
         /** QuestionnaireSummary */
         QuestionnaireSummary: {
             /** Score */
@@ -1765,6 +2312,13 @@ export interface components {
             /** Concern */
             concern: number | null;
         };
+        /** SaveSectionRequest */
+        SaveSectionRequest: {
+            /** Answers */
+            answers: {
+                [key: string]: unknown;
+            };
+        };
         /** ScoreBand */
         ScoreBand: {
             risk_class: components["schemas"]["RiskClass"];
@@ -1852,6 +2406,17 @@ export interface components {
             /** Score */
             score: number | null;
             risk_class: components["schemas"]["RiskClass"] | null;
+        };
+        /** SectionOut */
+        SectionOut: {
+            /** Id */
+            id: string;
+            /** Title En */
+            title_en: string;
+            /** Title Bn */
+            title_bn: string;
+            /** Questions */
+            questions: components["schemas"]["QuestionOut"][];
         };
         /**
          * Sex
@@ -2087,6 +2652,29 @@ export interface components {
             share_medications?: boolean | null;
             /** Share Documents */
             share_documents?: boolean | null;
+        };
+        /** UpdateLogRequest */
+        UpdateLogRequest: {
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Domains */
+            domains?: components["schemas"]["LogDomain"][];
+            /** Ratings */
+            ratings?: {
+                [key: string]: number;
+            };
+            /** Text */
+            text?: string | null;
+            /** Goal Id */
+            goal_id?: number | null;
+            goal_progress?: components["schemas"]["GoalProgress"] | null;
+            /** Mood */
+            mood?: number | null;
+            type: components["schemas"]["LogType"];
+            visibility: components["schemas"]["LogVisibility"];
         };
         /** UpdateMeRequest */
         UpdateMeRequest: {
@@ -2976,6 +3564,341 @@ export interface operations {
             };
         };
     };
+    activateCompanion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                child_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Diagnosis"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildOut"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCharacteristicsQuestionnaire: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharacteristicsQuestionnaireOut"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCharacteristics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                child_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharacteristicsOut"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    saveCharacteristicsSection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                section_id: string;
+                child_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveSectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharacteristicsOut"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listGoals: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                child_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalOut"][];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listLogs: {
+        parameters: {
+            query?: {
+                author_role?: components["schemas"]["Role"] | null;
+                domain?: components["schemas"]["LogDomain"] | null;
+                type?: components["schemas"]["LogType"] | null;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                child_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogPage"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createLog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                child_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLogRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogOut"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getLog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                log_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogOut"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateLog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                log_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateLogRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogOut"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    explainLog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                log_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExplainRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogExplanation"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     listNotifications: {
         parameters: {
             query?: never;
@@ -3646,6 +4569,134 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": unknown;
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    askCompanionChat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                child_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanionChatRequest"];
+            };
+        };
+        responses: {
+            /** @description The streamed reply */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listCompanionConversations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                child_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationSummary"][];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listCompanionMessages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanionMessageOut"][];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCompanionChatSuggestions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                child_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatSuggestionsOut"];
                 };
             };
             /** @description Error */

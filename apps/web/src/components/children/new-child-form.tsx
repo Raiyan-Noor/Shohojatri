@@ -19,8 +19,9 @@ import { Link, useRouter } from "@/lib/i18n/navigation";
 
 const SEXES = ["female", "male", "unsaid"] as const;
 
-/** A parent adds a child. Screening (B4) and the profile wizard (B9) build on this record. */
-export function NewChildForm() {
+/** A parent adds a child. Screening (B4) and the profile wizard (B9) build on this record; with
+ *  `companion` the wizard follows straight away (COMPANION_SPEC §1, "create directly"). */
+export function NewChildForm({ companion = false }: { companion?: boolean }) {
   const t = useTranslations("children.new");
   const tv = useTranslations("auth.validation");
   const tCommon = useTranslations("common");
@@ -48,12 +49,12 @@ export function NewChildForm() {
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      await createChild.mutateAsync({
+      const child = await createChild.mutateAsync({
         name: values.name,
         dob: values.dob,
         sex: values.sex === "unsaid" ? null : values.sex,
       });
-      router.push("/home");
+      router.push(companion ? `/children/${child.id}/activate` : "/home");
     } catch (error) {
       showApiError(error, form.setError, errorMessage(error));
     }
@@ -70,7 +71,9 @@ export function NewChildForm() {
       </Link>
       <div>
         <h1 className="m-0 font-display text-h1 font-bold text-text-1">{t("title")}</h1>
-        <p className="mt-1 mb-0 text-body text-text-2">{t("subtitle")}</p>
+        <p className="mt-1 mb-0 text-body text-text-2">
+          {companion ? t("subtitleCompanion") : t("subtitle")}
+        </p>
       </div>
 
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5">
@@ -110,7 +113,7 @@ export function NewChildForm() {
         </fieldset>
         <FormAlert message={errors.root?.message} />
         <Button type="submit" size="lg" icon={Plus} loading={isSubmitting} className="self-start">
-          {t("submit")}
+          {companion ? t("submitCompanion") : t("submit")}
         </Button>
       </form>
     </div>

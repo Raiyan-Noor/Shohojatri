@@ -1,7 +1,15 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, CircleCheck, UserPlus, XCircle, type LucideIcon } from "lucide-react";
+import {
+  Bell,
+  CircleCheck,
+  NotebookText,
+  Rows3,
+  UserPlus,
+  XCircle,
+  type LucideIcon,
+} from "lucide-react";
 import { useFormatter, useNow, useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 
@@ -16,6 +24,8 @@ const ICONS: Record<AppNotification["kind"], LucideIcon> = {
   access_request_received: UserPlus,
   access_request_approved: CircleCheck,
   access_request_declined: XCircle,
+  log_added: NotebookText,
+  log_digest: Rows3,
 };
 
 /** Header bell with the in-app notification list (request received / approved / declined). */
@@ -117,11 +127,19 @@ function NotificationItem({ item, onDone }: { item: AppNotification; onDone: () 
     role: payload.requester_role ? tRoles(payload.requester_role) : "",
     child: payload.child_name ?? "",
     code: payload.child_code ?? "",
+    author: payload.author_name ?? "",
+    authorRole: payload.author_role ? tRoles(payload.author_role) : "",
+    count: payload.count ?? 0,
   });
-  const target =
-    item.kind === "access_request_received" && payload.child_id
+  const target = !payload.child_id
+    ? me && homePathFor(me)
+    : item.kind === "access_request_received"
       ? `/children/${payload.child_id}/care-team`
-      : me && homePathFor(me);
+      : item.kind === "log_added"
+        ? `/children/${payload.child_id}/timeline#log-${payload.log_id}`
+        : item.kind === "log_digest"
+          ? `/children/${payload.child_id}/timeline`
+          : me && homePathFor(me);
 
   return (
     <li className="border-b border-border-1 last:border-b-0">

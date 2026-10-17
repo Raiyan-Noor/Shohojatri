@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from app.models import NotificationKind, Role
 
@@ -14,6 +14,12 @@ class NotificationPayload(BaseModel):
     child_code: str | None = None
     requester_name: str | None = None
     requester_role: Role | None = None
+    # log_added: who wrote the entry.
+    author_name: str | None = None
+    author_role: Role | None = None
+    log_id: int | None = None
+    # log_digest: how many entries it stands for.
+    count: int | None = None
 
 
 class NotificationOut(BaseModel):
@@ -21,7 +27,7 @@ class NotificationOut(BaseModel):
 
     id: int
     kind: NotificationKind
-    payload: NotificationPayload = Field(validation_alias="payload_json")
+    payload: NotificationPayload
     read_at: datetime | None
     created_at: datetime
 

@@ -69,3 +69,24 @@ Strings a native speaker should check for natural, simple spoken register (CLAUD
 - // TODO(bn-review) `resultsChat.intro` — "আমি শুধু এই স্ক্রিনিংয়ের তথ্য দেখে উত্তর দিই"
 - // TODO(bn-review) `errors.ai_unavailable` — "আপনার প্রশ্নটা বক্সেই আছে" for "your question is still in the box"
 - // TODO(bn-review) The model's Bangla replies: `results_explainer.md` asks for simple spoken Bangla and "আপনার সন্তান/বাচ্চা"; check real replies with a native speaker before a pilot.
+
+### B9 — companion profile, characteristics, timeline
+
+- // TODO(bn-review) `companion.diagnosis.kinds.*` — "অটিজম, সাথে অন্য একটি অবস্থা", "অন্য কোনো বিকাশজনিত অবস্থা" for "another developmental condition"
+- // TODO(bn-review) the characteristics questionnaire (`apps/api/app/seed/characteristics.yaml`, every `text_bn` and `bn`) — e.g. "নিজের কথা বোঝায়", "বড়দের হাত ধরে টেনে নিয়ে যায়", "এড়িয়ে চলে / খোঁজে / পার্থক্য নেই" for the sensory grid; a clinician should read it
+- // TODO(bn-review) `logs.domains.*` — "ভাষা ও যোগাযোগ", "আচরণ ও আবেগ", "দৈনন্দিন কাজ" for daily living, "চলাফেরা" for motor
+- // TODO(bn-review) `logs.types.*` — "যা দেখলাম" for observation, "দুশ্চিন্তা" for concern, "ক্লিনিক্যাল নোট" (kept as a loanword)
+- // TODO(bn-review) `logs.moods.*` and `logs.faces.*` — "মন খারাপ / অস্থির / শান্ত / খুশি / খুব খুশি"
+- // TODO(bn-review) `logs.templates.*` — the teacher and specialist template headings ("যা কাজে দিয়েছে", "বাসার জন্য পরামর্শ")
+- // TODO(bn-review) `logs.visibility.*` — "শুধু বিশেষজ্ঞ" for clinical, "ব্যক্তিগত" for private
+- // TODO(bn-review) `logs.explain.*` — "সহজ করে বুঝিয়ে দিন" (from the design), "আমার নোট হিসেবে রাখুন"; and the model's Bangla explanations (`log_explainer.md`) need a native speaker's check with a real key
+- // TODO(bn-review) `notifications.kinds.log_added` / `log_digest` — "{child}-এর বিষয়ে" after Latin names
+
+### Companion chat (first version)
+
+- // TODO(bn-review) `companionChat.empty.*` — "{name}-এর বিষয়ে যা খুশি জিজ্ঞেস করুন", "আমি শুধু {name}-এর লগ আর নোট দেখে উত্তর দিই। আমি ডাক্তার নই, রোগনির্ণয়ও করি না।"
+- // TODO(bn-review) `companionChat.source.*` — "শিক্ষকের নোট" (gender-neutral; the design has "শিক্ষিকার"), "অভিভাবকের লগ", "বিশেষজ্ঞের নোট"
+- // TODO(bn-review) `companionChat.urgent.*` — the urgent card ("এখনই একজন ডাক্তারের সাথে কথা বলুন", "এটা চ্যাটে সামলানোর বিষয় নয়"); a clinician should read it with OPEN_QUESTIONS #20
+- // TODO(bn-review) `companionChat.suggestions.*` — e.g. "“{goal}” — এই লক্ষ্যে {name} কেমন এগোচ্ছে?", "{name} অস্থির হলে কী করলে শান্ত হয়?"
+- // TODO(bn-review) `companionChat.errors.*` — "আজকের প্রশ্নের সীমা শেষ", "সমস্যাটা আমাদের দিকে"
+- // TODO(bn-review) the model's Bangla replies (`companion_system.md`) need a native speaker's check with a real key (`scripts/try_chat.py`)

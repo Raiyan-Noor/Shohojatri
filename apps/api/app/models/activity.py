@@ -13,6 +13,11 @@ class NotificationKind(StrEnum):
     access_request_received = "access_request_received"
     access_request_approved = "access_request_approved"
     access_request_declined = "access_request_declined"
+    # A teacher or specialist added a timeline entry (COMPANION_SPEC §5.2). When a child gets
+    # more than 3 in one day, the list shows them as one digest (app/core/notifications.py).
+    log_added = "log_added"
+    # Never stored: how the list shows a day's log_added rows for one child when there are many.
+    log_digest = "log_digest"
 
 
 class Notification(Base):

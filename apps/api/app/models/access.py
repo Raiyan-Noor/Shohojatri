@@ -63,4 +63,6 @@ class AccessGrant(Base):
     # Always true in the POC: the design shows logs as "always on" for every member.
     can_add_logs: Mapped[bool] = mapped_column(Boolean, default=True)
     granted_at: Mapped[datetime] = mapped_column(UtcDateTime, default=utcnow)
+    # When the member last opened the timeline: entries since then show as "N new" on their card.
+    logs_seen_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
     revoked_at: Mapped[datetime | None] = mapped_column(UtcDateTime)

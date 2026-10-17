@@ -11,3 +11,18 @@ export function ageInMonths(dob: string, today: string = todayInBangladesh()): n
   if (td < bd) months -= 1;
   return Math.max(months, 0);
 }
+
+/** An ISO timestamp as a `datetime-local` value in Bangladesh time ("2026-10-17T14:05"). */
+export function toBdLocalInput(iso: string | Date): string {
+  const date = typeof iso === "string" ? new Date(iso) : iso;
+  // sv-SE formats as "YYYY-MM-DD HH:mm:ss".
+  return date
+    .toLocaleString("sv-SE", { timeZone: "Asia/Dhaka", hour12: false })
+    .slice(0, 16)
+    .replace(" ", "T");
+}
+
+/** A `datetime-local` value read as Bangladesh time (UTC+6, no daylight saving) → ISO. */
+export function fromBdLocalInput(value: string): string {
+  return new Date(`${value}:00+06:00`).toISOString();
+}

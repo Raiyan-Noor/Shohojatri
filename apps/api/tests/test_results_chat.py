@@ -192,7 +192,7 @@ def test_prompt_ends_with_the_safety_rules(
 ) -> None:
     events(ask(as_parent, screening_id, "Does my child have autism?"))
     prompt = fake_llm.calls[0]["prompt"]
-    assert prompt.version == "results_explainer-1+safety-1"
+    assert prompt.version == "results_explainer-2+safety-1"
     assert prompt.text.endswith(llm.load_prompt("safety").text)
     assert "999" in prompt.text
 

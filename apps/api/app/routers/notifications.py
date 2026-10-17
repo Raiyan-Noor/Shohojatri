@@ -1,8 +1,9 @@
 from fastapi import APIRouter
-from sqlalchemy import func, select, update
+from sqlalchemy import select, update
 
 from app.core.deps import CurrentUser, DbSession
 from app.core.errors import ApiError
+from app.core.notifications import same_digest, with_digests
 from app.models import Notification
 from app.models.base import utcnow
 from app.schemas.notifications import NotificationList, NotificationOut
@@ -11,23 +12,22 @@ from app.schemas.users import OkResponse
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
 _LIST_LIMIT = 50
+# Rows looked at to build the list: digests fold many rows into one item.
+_SCAN_LIMIT = 300
 
 
 @router.get("", operation_id="listNotifications")
 def list_notifications(user: CurrentUser, db: DbSession) -> NotificationList:
-    items = db.scalars(
+    rows = db.scalars(
         select(Notification)
         .where(Notification.user_id == user.id)
         .order_by(Notification.created_at.desc(), Notification.id.desc())
-        .limit(_LIST_LIMIT)
+        .limit(_SCAN_LIMIT)
     )
-    unread = db.scalar(
-        select(func.count())
-        .select_from(Notification)
-        .where(Notification.user_id == user.id, Notification.read_at.is_(None))
-    )
+    items = with_digests(list(rows))
     return NotificationList(
-        items=[NotificationOut.model_validate(n) for n in items], unread=unread or 0
+        items=[NotificationOut.model_validate(n) for n in items[:_LIST_LIMIT]],
+        unread=sum(1 for n in items if n.read_at is None),
     )
 
 
@@ -36,9 +36,12 @@ def mark_read(notification_id: int, user: CurrentUser, db: DbSession) -> OkRespo
     notification = db.get(Notification, notification_id)
     if notification is None or notification.user_id != user.id:
         raise ApiError(404, "not_found")
-    if notification.read_at is None:
-        notification.read_at = utcnow()
-        db.commit()
+    # Reading a digest reads every entry it stands for.
+    now = utcnow()
+    for n in same_digest(db, notification):
+        if n.read_at is None:
+            n.read_at = now
+    db.commit()
     return OkResponse()
 
 

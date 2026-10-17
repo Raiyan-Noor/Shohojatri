@@ -46,13 +46,15 @@ function Gate({ redirectFor, children }: { redirectFor: RedirectFor; children: R
   return <div className="flex min-h-dvh flex-col items-center justify-center">{content}</div>;
 }
 
-/** Only for `role`. Others go to their own home; logged-out users to login and back. */
-export function RequireRole({ role, children }: { role: Role; children: ReactNode }) {
+/** Only for `role` (or any of several). Others go to their own home; logged-out users to login
+ *  and back. */
+export function RequireRole({ role, children }: { role: Role | Role[]; children: ReactNode }) {
+  const roles = Array.isArray(role) ? role : [role];
   return (
     <Gate
       redirectFor={(me, pathname) => {
         if (!me) return `/login?next=${encodeURIComponent(pathname)}`;
-        if (me.must_change_password || me.role !== role) return homePathFor(me);
+        if (me.must_change_password || !roles.includes(me.role)) return homePathFor(me);
         return null;
       }}
     >

@@ -1,16 +1,19 @@
 "use client";
 
-import { BadgeCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck, NotebookPen } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
 import { MyRequests } from "@/components/access/my-requests";
 import { RequestAccessBox } from "@/components/access/request-access-box";
+import { AskCardLink } from "@/components/chat/ask-links";
 import { QueryView } from "@/components/app/query-view";
+import { buttonClasses } from "@/components/ui/button";
 import { ChildCard } from "@/components/ui/child-card";
 import { RoleBadge } from "@/components/ui/role-badge";
 import { StateView } from "@/components/ui/state-view";
 import { useMe } from "@/lib/auth/session";
 import { useChildren, useFormatAge } from "@/lib/children/queries";
+import { Link } from "@/lib/i18n/navigation";
 
 /** Teacher and specialist home (COMPANION_SPEC §14): request box, approved children, own
  *  requests. Not designed yet (handoff §1); built from the primitives. */
@@ -64,7 +67,6 @@ export function MemberHome({ initialCode }: { initialCode?: string }) {
             <ul className="m-0 grid list-none gap-4 p-0 sm:grid-cols-2">
               {list.map((child) => (
                 <li key={child.id}>
-                  {/* Opens the child dashboard once it exists (B13). */}
                   <ChildCard
                     name={child.name}
                     meta={formatAge(child.age_months)}
@@ -83,6 +85,33 @@ export function MemberHome({ initialCode }: { initialCode?: string }) {
                         })}
                       </p>
                     )}
+                    <div className="mt-auto flex flex-col gap-2">
+                      <Link
+                        href={`/children/${child.id}/timeline`}
+                        className="flex min-h-12 items-center gap-3 rounded-md bg-n-50 px-4 py-2 font-semibold text-navy no-underline hover:bg-navy-50"
+                      >
+                        <span className="flex-1">
+                          {tChildren("timeline")}
+                          {child.new_logs > 0 && (
+                            <span className="ml-2 inline-block rounded-pill bg-amber-50 px-2.5 py-0.5 text-small font-semibold text-amber-ink">
+                              {tChildren("newLogs", { count: child.new_logs })}
+                            </span>
+                          )}
+                        </span>
+                        <ArrowRight aria-hidden className="size-5" />
+                      </Link>
+                      <AskCardLink childId={child.id} />
+                      {/* "Add classroom note" / "Add clinical note" is the card's main action (§14). */}
+                      <Link
+                        href={`/children/${child.id}/logs/new`}
+                        className={buttonClasses({ size: "md", block: true })}
+                      >
+                        <NotebookPen aria-hidden className="size-5" />
+                        {me.role === "specialist"
+                          ? t("member.addClinical")
+                          : t("member.addClassroom")}
+                      </Link>
+                    </div>
                   </ChildCard>
                 </li>
               ))}

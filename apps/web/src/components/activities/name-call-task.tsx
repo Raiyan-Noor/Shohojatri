@@ -15,7 +15,7 @@ import { CamFeed } from "./cam-feed";
 import { useCapture } from "./capture-provider";
 import { ParentControls, Stage, StageToast, TrialDots } from "./stage";
 import { type RunContext, TaskFrame } from "./task-frame";
-import { useToast } from "./use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 // SCREENING_SPEC §4.4.
 const TRIALS = 3;

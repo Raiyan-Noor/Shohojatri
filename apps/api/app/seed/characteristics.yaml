@@ -1,0 +1,252 @@
+# Child characteristics questionnaire, COMPANION_SPEC §4 (transcribed; change the spec first).
+#
+# Filled in after a diagnosis, one section per screen. Every answer is versioned
+# (`characteristics` table), and the context engine (B11) reads it.
+#
+# Question types:
+#   single    one option, or "other" with own words (when other: true)
+#   multi     any number of options, plus "other" with own words (when other: true)
+#   grid      one column per row (sensory: avoids / seeks / no difference)
+#   text      free text
+#   tags      short free-text chips
+#   list      up to `max` short free-text entries (family goals)
+#   therapies rows of therapy type (+ own words for "other"), provider and how often
+#
+# Options marked "# added" are not listed in the spec and were added so every question has
+# answer cards; see docs/CHANGELOG.md (B9).
+#
+# The Bangla needs review by a native speaker before any pilot (apps/web/messages/_review.md).
+version: characteristics-1
+sections:
+  - id: communication
+    title_en: Communication
+    title_bn: যোগাযোগ
+    questions:
+      - id: main_way
+        type: multi
+        other: true
+        text_en: How does your child mostly communicate?
+        text_bn: আপনার শিশু সাধারণত কীভাবে নিজের কথা বোঝায়?
+        options:
+          - { id: sentences, en: Speaks in sentences, bn: বাক্য বলে কথা বলে }
+          - { id: short_phrases, en: Short phrases, bn: ছোট ছোট কথা বলে }
+          - { id: single_words, en: Single words, bn: একটা একটা শব্দ বলে }
+          - { id: sounds_gestures, en: Sounds and gestures, bn: শব্দ বা ইশারা করে }
+          - { id: pictures_device, en: Picture cards (PECS) or a device, bn: ছবির কার্ড (PECS) বা ডিভাইস দিয়ে }
+          - { id: pulls_hand, en: Pulls an adult's hand, bn: বড়দের হাত ধরে টেনে নিয়ে যায় }
+      - id: understands
+        type: single
+        other: true
+        text_en: How much does your child understand?
+        text_bn: আপনার শিশু কতটা বুঝতে পারে?
+        options:
+          - { id: most_everyday, en: Most everyday talk, bn: রোজকার বেশিরভাগ কথা }
+          - { id: simple_instructions, en: Simple instructions, bn: সহজ নির্দেশনা }
+          - { id: few_words, en: A few words, bn: অল্প কয়েকটা শব্দ }
+          - { id: unsure, en: Not sure, bn: ঠিক জানি না }
+      - id: home_languages
+        type: multi
+        other: true
+        text_en: Which languages are spoken at home?
+        text_bn: বাসায় কোন ভাষায় কথা হয়?
+        options:
+          - { id: bangla, en: Bangla, bn: বাংলা }
+          - { id: english, en: English, bn: ইংরেজি }
+
+  - id: social_play
+    title_en: Social & play
+    title_bn: মেলামেশা ও খেলা
+    questions:
+      - id: enjoys
+        type: multi
+        other: true
+        text_en: Who does your child enjoy playing with?
+        text_bn: আপনার শিশু কার সাথে খেলতে পছন্দ করে?
+        options:
+          - { id: alone, en: Playing alone, bn: একা একা }
+          - { id: with_parents, en: With parents, bn: মা-বাবার সাথে }
+          - { id: with_children, en: With other children, bn: অন্য বাচ্চাদের সাথে }
+      - id: favourite_play
+        type: text
+        text_en: What kinds of play are their favourites?
+        text_bn: কোন ধরনের খেলা সবচেয়ে পছন্দ?
+      - id: happy_signs
+        type: text
+        text_en: How do they show they're happy?
+        text_bn: খুশি হলে কীভাবে বোঝায়?
+
+  - id: sensory
+    title_en: Senses
+    title_bn: ইন্দ্রিয় অনুভূতি
+    questions:
+      - id: senses
+        type: grid
+        text_en: For each, does your child avoid it, seek it, or show no difference?
+        text_bn: প্রতিটির বেলায় আপনার শিশু কি এড়িয়ে চলে, খোঁজে, নাকি কোনো পার্থক্য নেই?
+        rows:
+          - { id: sound, en: Sound, bn: শব্দ }
+          - { id: light, en: Light, bn: আলো }
+          - { id: touch, en: Touch, bn: স্পর্শ }
+          - { id: taste_texture, en: Taste and texture of food, bn: খাবারের স্বাদ ও ধরন }
+          - { id: smell, en: Smell, bn: গন্ধ }
+          - { id: movement, en: Movement, bn: "নড়াচড়া, দোলা" }
+        options:
+          - { id: avoids, en: Avoids, bn: এড়িয়ে চলে }
+          - { id: seeks, en: Seeks, bn: খোঁজে }
+          - { id: no_difference, en: No difference, bn: পার্থক্য নেই }
+      - id: sensitivities
+        type: tags
+        text_en: Anything specific? (e.g. pressure-cooker whistle, blender)
+        text_bn: নির্দিষ্ট কিছু? (যেমন প্রেশার কুকারের সিটি, ব্লেন্ডার)
+
+  - id: triggers
+    title_en: What upsets them
+    title_bn: কী হলে অস্থির হয়
+    questions:
+      - id: triggers
+        type: multi
+        other: true
+        text_en: What tends to upset your child?
+        text_bn: কোন কোন জিনিসে আপনার শিশু অস্থির হয়ে পড়ে?
+        options:
+          - { id: loud_noise, en: Loud noise, bn: জোরে শব্দ }
+          - { id: crowds, en: Crowds, bn: ভিড় }
+          - { id: routine_change, en: Change in routine, bn: রুটিন বদলালে }
+          - { id: waiting, en: Waiting, bn: অপেক্ষা করতে হলে }
+          - { id: transitions, en: Moving from one activity to another, bn: এক কাজ থেকে আরেক কাজে যেতে }
+          - { id: clothes, en: Certain clothes, bn: কিছু কাপড় }
+          - { id: haircut_nails, en: Haircut or nail-cutting, bn: চুল বা নখ কাটা }
+          - { id: hunger, en: Hunger, bn: খিদে পেলে }
+          - { id: tiredness, en: Tiredness, bn: ক্লান্ত হলে }
+
+  - id: calming
+    title_en: What helps them calm down
+    title_bn: কীসে শান্ত হয়
+    questions:
+      - id: calming
+        type: multi
+        other: true
+        text_en: What helps your child calm down?
+        text_bn: কী করলে আপনার শিশু শান্ত হয়?
+        options:
+          - { id: quiet_corner, en: A quiet corner, bn: চুপচাপ এক কোণে থাকা }
+          - { id: favourite_object, en: A favourite toy or object, bn: প্রিয় খেলনা বা জিনিস }
+          - { id: deep_pressure, en: Deep pressure or a tight hug, bn: শক্ত করে জড়িয়ে ধরা }
+          - { id: music, en: Music, bn: গান-বাজনা }
+          - { id: rocking_swinging, en: Rocking or swinging, bn: দোল খাওয়া বা দোলনা }
+          - { id: specific_song, en: A specific song, bn: নির্দিষ্ট একটা গান }
+          - { id: screen_time, en: Screen time, bn: মোবাইল বা টিভি দেখা }
+
+  - id: strengths
+    title_en: Strengths & interests
+    title_bn: শক্তি ও ভালো লাগা
+    questions:
+      - id: interests
+        type: multi
+        other: true
+        text_en: What do they love, or are good at?
+        text_bn: কী ভালোবাসে বা কীসে ভালো?
+        options:
+          - { id: numbers, en: Numbers, bn: সংখ্যা }
+          - { id: letters, en: Letters, bn: অক্ষর }
+          - { id: music, en: Music, bn: গান-বাজনা }
+          - { id: puzzles, en: Puzzles, bn: পাজল }
+          - { id: vehicles, en: Vehicles, bn: গাড়ি }
+          - { id: animals, en: Animals, bn: পশুপাখি }
+          - { id: drawing, en: Drawing, bn: আঁকা }
+      - id: strengths_text
+        type: text
+        text_en: Tell us more in your own words
+        text_bn: নিজের ভাষায় আরও লিখুন
+
+  - id: daily_living
+    title_en: Daily living
+    title_bn: দৈনন্দিন জীবন
+    questions:
+      - id: sleep
+        type: multi
+        other: true
+        text_en: Sleep
+        text_bn: ঘুম
+        options:
+          - { id: falls_asleep_easily, en: Falls asleep easily, bn: সহজে ঘুমিয়ে পড়ে }
+          - { id: takes_long, en: Takes long to fall asleep, bn: ঘুমাতে অনেক সময় লাগে }
+          - { id: wakes_at_night, en: Wakes at night, bn: রাতে জেগে ওঠে }
+      - id: eating
+        type: single
+        other: true
+        text_en: Eating
+        text_bn: খাওয়া
+        options:
+          - { id: most_foods, en: Eats most foods, bn: বেশিরভাগ খাবার খায় }
+          - { id: limited, en: Eats a limited range, bn: অল্প কিছু খাবার খায় }
+          - { id: very_limited, en: Eats very few foods, bn: খুব অল্প খাবার খায় }
+      - id: toileting
+        type: single
+        other: true
+        text_en: Toileting
+        text_bn: টয়লেট
+        options:
+          - { id: trained, en: Trained, bn: নিজে পারে }
+          - { id: in_progress, en: Learning now, bn: শিখছে }
+          - { id: not_started, en: Not started, bn: এখনও শুরু হয়নি }
+      - id: dressing
+        type: single
+        other: true
+        text_en: Dressing
+        text_bn: জামাকাপড় পরা
+        options:
+          - { id: mostly_self, en: Mostly by themselves, bn: বেশিরভাগ নিজে পারে } # added
+          - { id: some_help, en: Needs some help, bn: কিছুটা সাহায্য লাগে } # added
+          - { id: full_help, en: Needs full help, bn: পুরোপুরি সাহায্য লাগে } # added
+
+  - id: current_support
+    title_en: Current support
+    title_bn: এখনকার সাপোর্ট
+    questions:
+      - id: therapies
+        type: therapies
+        text_en: Therapies your child goes to
+        text_bn: আপনার শিশু কোন কোন থেরাপিতে যায়
+        options:
+          - { id: speech, en: Speech therapy, bn: স্পিচ থেরাপি }
+          - { id: ot, en: Occupational therapy (OT), bn: অকুপেশনাল থেরাপি (OT) }
+          - { id: aba, en: ABA / behavioural therapy, bn: ABA / আচরণগত থেরাপি }
+          - { id: physio, en: Physiotherapy, bn: ফিজিওথেরাপি }
+          - { id: special_education, en: Special education, bn: বিশেষ শিক্ষা }
+      - id: school
+        type: single
+        text_en: School
+        text_bn: স্কুল
+        options:
+          - { id: none, en: No school yet, bn: এখনও স্কুলে যায় না }
+          - { id: mainstream, en: Mainstream school, bn: সাধারণ স্কুল }
+          - { id: special, en: Special school, bn: বিশেষ স্কুল }
+          - { id: home_based, en: Home-based, bn: বাসায় পড়াশোনা }
+      - id: school_name
+        type: text
+        text_en: School name
+        text_bn: স্কুলের নাম
+
+  - id: health
+    title_en: Health
+    title_bn: স্বাস্থ্য
+    questions:
+      - id: other_conditions
+        type: text
+        text_en: Any other health conditions?
+        text_bn: অন্য কোনো স্বাস্থ্য সমস্যা আছে?
+      - id: medications
+        type: text
+        text_en: Medicines, written exactly as on the prescription
+        text_bn: ওষুধ — প্রেসক্রিপশনে যেভাবে লেখা, ঠিক সেভাবে
+
+  - id: family_goals
+    title_en: Your family's top goals
+    title_bn: আপনার পরিবারের প্রধান লক্ষ্য
+    questions:
+      - id: goals
+        type: list
+        max: 3
+        text_en: Up to 3 things you most hope for (e.g. "Say what he wants with words")
+        text_bn: সবচেয়ে বেশি যা চান, এমন ৩টি পর্যন্ত (যেমন "মুখে বলে চাইতে পারা")

@@ -5,6 +5,17 @@ from app.models.activity import AuditLog, Notification, NotificationKind
 from app.models.base import Base
 from app.models.chat import ChatMessage, ChatRole, Conversation, ConversationMode
 from app.models.child import Child, ChildStatus, Sex
+from app.models.companion import (
+    Characteristics,
+    Goal,
+    GoalProgress,
+    GoalStatus,
+    Log,
+    LogDomain,
+    LogType,
+    LogVersion,
+    LogVisibility,
+)
 from app.models.screening import (
     Informant,
     ReportShare,
@@ -22,16 +33,25 @@ __all__ = [
     "AccessRequestStatus",
     "AuditLog",
     "Base",
+    "Characteristics",
     "ChatMessage",
     "ChatRole",
     "Child",
     "ChildStatus",
     "Conversation",
     "ConversationMode",
+    "Goal",
+    "GoalProgress",
+    "GoalStatus",
     "GrantScope",
     "Informant",
     "LlmUsage",
     "Locale",
+    "Log",
+    "LogDomain",
+    "LogType",
+    "LogVersion",
+    "LogVisibility",
     "Notification",
     "NotificationKind",
     "RateLimitHit",

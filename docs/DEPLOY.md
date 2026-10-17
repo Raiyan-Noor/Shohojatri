@@ -114,6 +114,14 @@ It runs the same flow through the web app, its rewrite and the API, against the 
 5. creates a share link and opens it without a login;
 6. deletes the screening again (`--keep` leaves it).
 
+To check the companion chat (needs `OPENAI_API_KEY` on Render; it uses 8 of each demo user's daily LLM calls):
+
+```
+python scripts/try_chat.py https://shohojatri.vercel.app
+```
+
+It asks 8 sample questions as the parent, teacher and doctor, and prints each answer with its sources, the urgent flag, the time to the first text and the total time. **Streaming through the rewrite:** the chat answers with server-sent events, sent `Cache-Control: no-cache, no-transform` so that proxies don't buffer them. Locally, through `next dev` and its rewrite, a reply arrives in many chunks as it is written. If on Vercel the time to first text is close to the total time, the rewrite is buffering. The fix would be to call the API origin directly for `POST /children/{id}/chat` only, which needs CORS with credentials and cross-site cookies; it isn't built, because it hasn't been needed so far.
+
 Then by hand, on a phone:
 
 1. Open the site in Chrome on Android and log in as `parent@demo.bd` / `demo1234`.

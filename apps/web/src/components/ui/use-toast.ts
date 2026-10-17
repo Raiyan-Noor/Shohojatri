@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/** A message that disappears after a few seconds (the stage's "That try won't count"). */
+/** A message that disappears after a few seconds ("That try won't count", "Entry saved"). */
 export function useToast(ms = 2500): [string | null, (message: string) => void] {
   const [message, setMessage] = useState<string | null>(null);
   const timer = useRef(0);

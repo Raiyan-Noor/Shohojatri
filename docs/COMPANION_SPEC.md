@@ -19,6 +19,7 @@ screening ──(parent: "My child has been assessed")──► companion
   3. Care team: shows the **Child ID** with copy / share / QR so the parent can give it to teachers and doctors.
   4. Done → child dashboard.
 - `child.status` becomes `companion`. Nothing from screening is deleted.
+- Built (B9): the diagnosis date is a month (`YYYY-MM`), not before the child's birth month. "Pick a specialist on Shohojatri" offers the child's clinical care-team members (the directory was dropped in B8); their name is copied into the record. `POST /children/{id}/activate` is also how the parent changes the details later. The assessment-report upload arrives with Documents (B10). A child diagnosed elsewhere is added with `/children/new?companion=1`, which continues into the wizard.
 
 ## 2. Child ID
 
@@ -83,6 +84,8 @@ Sections (keep each short; one section per screen):
 9. **Health** — other conditions (free text), medications (prefer entering via a prescription upload, §6).
 10. **Family's top goals** — up to 3, free text ("Say what he wants with words", "Sit for meals").
 
+Built (B9): the content (bilingual options) lives in `app/seed/characteristics.yaml`, served by `GET /characteristics/questionnaire`. "Favourite kinds of play", "how they show they're happy" and "other conditions" are free text; dressing got three options not listed here (mostly by themselves / some help / full help). The sensory grid has no "Other" (the free-text chips cover it). Each section is saved on its own (`PUT /children/{id}/characteristics/sections/{section}`); a saved section that changes makes a new version of the whole answer set, and saving identical answers doesn't. A section counts as done once saved, even if empty; skipped sections stay open and the dashboard nudges. Only the parent edits; every member reads, except the Health section's medicines answer, which follows the medications row of §3.2.
+
 ## 5. Logs (the heart of continuous tracking)
 
 ### 5.1 Log entry
@@ -104,9 +107,11 @@ Sections (keep each short; one section per screen):
 - Entries are append-only. Authors can edit within 24 h; after that, add a correction that links to the original. Edits are versioned.
 - **"Explain this to me"** button on teacher/specialist entries (parent view): the AI rewrites the entry in simple words in the parent's language, with what it might mean at home and what to ask next time. Not saved unless the parent saves it as a note. This addresses updates the parent can't easily interpret.
 - Template prompts per role: Teacher — "Today in class: participation, communication, behaviour, what worked"; Specialist — "Session focus, progress on goals, home recommendations, next review".
+- Built (B9) rules: an edit is allowed only to the author and only within 24 h of writing it (not of `occurred_at`); each edit keeps the previous content in `log_versions`. A correction is allowed only after that window, only by the author, and only once per entry (`corrects_log_id` is unique), so corrections form a chain; a correction always has the original's visibility. Who may write what: `clinical_note` only specialists; `clinical` visibility only people who can read clinical entries (not teachers); `check_in` only the app itself. Quick-log ratings rate every chosen topic the same. An entry needs a topic or some text. A parent may keep an explanation as a `private` note whose `explains_log_id` points at the explained entry; the model sees only that one entry (no name, no other record data).
 
 ### 5.2 Notifications
 Parent gets an in-app notification for new teacher/specialist entries (batched into a daily digest when more than 3). Care team members see new entries on the child card ("2 new").
+Built (B9): the digest is formed when the list is read — more than 3 `log_added` notifications for one child on one Bangladesh day show as one `log_digest` item, and reading it reads them all. "N new" counts entries by others, visible to the member, written since the member last opened the first page of the timeline (`access_grants.logs_seen_at`, or the grant date).
 
 ## 6. Documents (reports, prescriptions)
 
@@ -183,6 +188,8 @@ When a teacher or specialist reads the context or chats, filter the context at r
 
 ## 13. Chatbot
 
+> **Built so far (first version, before B11).** No context engine or retrieval yet: every message rebuilds a plain-text **child snapshot** from the database (`ai/snapshot.py`), filtered with the API's own rules (`ChildAccess.can`, `logs.visible_clause`). It holds basics, diagnosis, care team, the latest characteristics (medicines only for viewers with `read:medications`), active goals and the entries of the last 90 days, newest first, one line each, `[L{id}] date · role name · type · areas · rating · "text"`, capped at ≈ 8,000 tokens, with one line of per-area counts for older entries. The model cites entries as `[L12]`. The server keeps only ids that were in the snapshot, so a citation never reveals an entry the viewer can't see. There's no JSON tail and no suggested actions yet, and status reports are answered in the chat, not saved. `POST /children/{id}/chat` streams `meta` (conversation id, urgent from the question) → `delta`… → `done` (`message_id`, `sources`, `urgent`). `urgent` is a bn/en keyword check on the question (OPEN_QUESTIONS #20), or set when the reply mentions 999. `GET /children/{id}/conversations` lists the viewer's own conversations; `GET /conversations/{id}/messages` re-checks access and returns each reply's sources as they are now visible. `GET /children/{id}/chat/suggestions` returns starter questions by role, as message keys plus the child's name and active goals. B11 replaces the snapshot with the context engine behind the same endpoint and UI.
+
 ### 13.1 Who can use it
 Parent (full), teacher and specialist (within scope). Separate conversation history per user per child. The results chat in screening (SCREENING_SPEC §8) is a separate, narrower mode.
 
@@ -244,7 +251,7 @@ children(id, code[SJ-XXXXX], parent_id, name, dob, sex, status[screening|compani
 access_requests(id, child_id?, requester_id, child_code, message, status[pending|approved|declined|expired|cancelled], created_at, decided_at)
                  -- child_id NULL when the typed code matched no child (§3.1); child_code = the code as typed
 access_grants(id, child_id, user_id, scope[education|clinical], share_medications, share_documents,
-              can_add_logs, granted_at, revoked_at)
+              can_add_logs, granted_at, logs_seen_at, revoked_at)
 screenings(id, child_id, created_by, locale, age_months, informant[mother|father|other_caregiver],
            consent_version, consent_at, status[in_progress|finalized], is_demo, parent_note,
            questionnaire_completed_at, result_json, scoring_version, created_at, finalized_at)
@@ -255,8 +262,11 @@ screening_tasks(id, screening_id, task, variant, status, demo, payload_json, res
 report_shares(id, screening_id, token_hash, expires_at, revoked_at, views, last_viewed_at, created_at)
            -- token_hash = SHA-256 of the link token (SCREENING_SPEC §7)
 characteristics(id, child_id, version, answers_json, created_by, created_at)
+           -- unique (child_id, version); answers_json = {questionnaire_version, sections: {id: answers}}
 logs(id, child_id, author_id, author_role, type, occurred_at, domains, ratings_json, text, goal_id,
-     goal_progress, mood, visibility, corrects_log_id, created_at, edited_at)
+     goal_progress, mood, visibility, corrects_log_id, explains_log_id, version, created_at, edited_at)
+           -- corrects_log_id unique (one correction per entry); explains_log_id = a parent's kept explanation
+log_versions(id, log_id, version, snapshot_json, edited_at)   -- content before each edit
 documents(id, child_id, uploaded_by, doc_type, file_path, mime, size, extracted_json, confirmed_json,
           status[uploaded|extracted|confirmed|failed], visibility, created_at)
 goals(id, child_id, title, domain, set_by_role, target_date, status, created_by, created_at)
@@ -282,14 +292,15 @@ audit_log(id, actor_id, child_id, action, resource, at)   -- resource: a kind ("
 POST /auth/signup (parent|teacher) · POST /auth/login · POST /auth/refresh · POST /auth/logout · POST /auth/change-password · GET /me · PATCH /me {preferred_locale}
 POST /children/{id}/activate                 diagnosis details
 POST /children (parent) · GET/PUT /children/{id} · POST /children/{id}/regenerate-code · DELETE /children/{id}
-GET/PUT /children/{id}/characteristics
+GET /characteristics/questionnaire · GET /children/{id}/characteristics · PUT /children/{id}/characteristics/sections/{section}
 POST /access-requests {child_code, message} · GET /access-requests (mine) · POST /access-requests/{id}/cancel
 GET /children/{id}/access-requests (pending, for the parent)
 POST /access-requests/{id}/approve {scope options} · POST /access-requests/{id}/decline
 GET /children/{id}/grants · PATCH /grants/{id} {scope options} · DELETE /grants/{id}
 GET /children/{id}/activity (audit feed, parent)
 GET /children (cards visible to me)
-GET/POST /children/{id}/logs · PATCH /logs/{id} · POST /logs/{id}/explain
+GET/POST /children/{id}/logs ?author_role&domain&type&offset&limit · GET/PATCH /logs/{id} · POST /logs/{id}/explain
+GET /children/{id}/goals                     (create/edit: B10)
 POST /children/{id}/documents · GET /documents/{id}/file · POST /documents/{id}/extract · POST /documents/{id}/confirm
 GET/POST /children/{id}/goals|therapies|medications · PATCH/DELETE equivalents
 GET/POST /children/{id}/schedule · POST /occurrences/{id}/done

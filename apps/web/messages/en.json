@@ -25,7 +25,13 @@
       "screeningDemo": "Demo games",
       "settings": "Settings",
       "offline": "Offline",
-      "resultsChat": "Questions about the result"
+      "resultsChat": "Questions about the result",
+      "timeline": "Timeline",
+      "childProfile": "Profile",
+      "newLog": "New entry",
+      "editLog": "Edit entry",
+      "activate": "Companion profile",
+      "companionChat": "Shohojatri AI"
     }
   },
   "common": {
@@ -139,12 +145,15 @@
       "childrenTitle": "Your children",
       "addChild": "Add a child",
       "emptyTitle": "Add your child to get started",
-      "emptyMessage": "Once your child is added, you can invite their teacher or doctor with a Child ID."
+      "emptyMessage": "Once your child is added, you can invite their teacher or doctor with a Child ID.",
+      "alreadyDiagnosed": "Already diagnosed somewhere else? Create a companion profile"
     },
     "member": {
       "childrenTitle": "Children you support",
       "emptyTitle": "No children yet",
-      "emptyMessage": "Ask a parent for their child's Shohojatri ID and send a request. The child appears here once the parent approves."
+      "emptyMessage": "Ask a parent for their child's Shohojatri ID and send a request. The child appears here once the parent approves.",
+      "addClassroom": "Add classroom note",
+      "addClinical": "Add clinical note"
     }
   },
   "children": {
@@ -174,8 +183,14 @@
       "female": "Girl",
       "male": "Boy",
       "unsaid": "Prefer not to say",
-      "submit": "Add child"
-    }
+      "submit": "Add child",
+      "subtitleCompanion": "For a child already diagnosed or being assessed. Next, you'll add the diagnosis details.",
+      "submitCompanion": "Next"
+    },
+    "timeline": "Timeline",
+    "traitsProgress": "Profile {done, number}/{total, number}",
+    "activate": "My child has been assessed",
+    "newLogs": "{count, number} new"
   },
   "screening": {
     "steps": {
@@ -496,7 +511,9 @@
     "kinds": {
       "access_request_received": "{requester} ({role}) asked to join {child}'s care team",
       "access_request_approved": "The parent approved your request — you can now see {child}'s profile",
-      "access_request_declined": "The parent declined your request for {code}"
+      "access_request_declined": "The parent declined your request for {code}",
+      "log_added": "{author} ({authorRole}) added a note about {child}",
+      "log_digest": "{count, number} new notes about {child} today from the care team"
     }
   },
   "admin": {
@@ -599,7 +616,20 @@
     "share_expired": "This link has closed.",
     "ai_not_configured": "The AI helper isn't switched on right now. Your report is safe.",
     "ai_quota_exceeded": "You've reached today's limit for questions. Please ask again tomorrow.",
-    "ai_unavailable": "We couldn't get an answer just now. Your question is still in the box: please try again in a moment."
+    "ai_unavailable": "We couldn't get an answer just now. Your question is still in the box: please try again in a moment.",
+    "invalid_answer": "That answer isn't one of the choices. Please check it and try again.",
+    "log_type_not_allowed": "You can't add this kind of entry.",
+    "log_visibility_not_allowed": "Choose who can see this again — that option isn't available to you.",
+    "log_in_future": "The time can't be in the future.",
+    "rating_without_domain": "Pick a topic for the rating.",
+    "log_empty": "Pick a topic or write a few words.",
+    "invalid_goal": "That goal isn't in this child's plan.",
+    "log_edit_window_closed": "Entries can only be changed for 24 hours. You can add a correction instead.",
+    "log_still_editable": "This entry can still be edited, so edit it instead.",
+    "log_already_corrected": "This entry already has a correction. Correct the newer one instead.",
+    "log_not_explainable": "Only notes from teachers and specialists can be explained.",
+    "diagnosis_before_birth": "That date is before your child was born.",
+    "not_a_care_team_specialist": "Choose a specialist who is on this child's care team."
   },
   "demo": {
     "profiles": {
@@ -1299,6 +1329,335 @@
       "button": "Install app",
       "iosSteps": "In Safari, tap the Share button (a square with an arrow pointing up), then choose “Add to Home Screen”.",
       "dismiss": "Not now"
+    }
+  },
+  "companion": {
+    "header": {
+      "back": "Back to home",
+      "addParent": "Write a log",
+      "addTeacher": "Add classroom note",
+      "addSpecialist": "Add clinical note",
+      "tabsLabel": "Child's pages",
+      "tabs": {
+        "timeline": "Timeline",
+        "profile": "Profile",
+        "care-team": "Care team",
+        "chat": "Chat"
+      }
+    },
+    "diagnosis": {
+      "kinds": {
+        "autism": "Autism (ASD)",
+        "autism_plus": "Autism and another condition",
+        "autism_plusNamed": "Autism + {condition}",
+        "other_condition": "Another developmental condition",
+        "other_conditionNamed": "{condition}",
+        "being_assessed": "Still being assessed"
+      },
+      "title": "Diagnosis details",
+      "subtitle": "Share as much as you know — it helps {name}'s care team understand them.",
+      "kind": "What was found?",
+      "kindRequired": "Please choose one.",
+      "condition": "Which condition?",
+      "conditionPlaceholder": "As written in the report",
+      "conditionRequired": "Please write which condition.",
+      "when": "When?",
+      "by": "Who diagnosed it?",
+      "byPlaceholder": "Doctor's name, hospital or centre",
+      "byTeam": "Or pick from the care team:",
+      "reportLater": "You'll be able to add the assessment report in Documents.",
+      "next": "Next"
+    },
+    "wizard": {
+      "steps": {
+        "diagnosis": "Diagnosis",
+        "traits": "About your child",
+        "team": "Care team"
+      },
+      "stepCount": "Step {step, number} of {total, number}",
+      "traitsTitle": "{name}, in your words",
+      "traitsSubtitle": "10 short parts, 1–2 minutes each. Skip any part or come back later.",
+      "noWrongAnswers": "There are no right or wrong answers — choose what you've seen.",
+      "startTraits": "Start",
+      "continueTraits": "Continue",
+      "traitsLater": "I'll do this later",
+      "next": "Next",
+      "sectionCount": "Part {n, number} of {total, number}",
+      "saveSection": "Save",
+      "nextSection": "Next part",
+      "finishTraits": "Done",
+      "cancel": "Cancel",
+      "skipSection": "Skip this part",
+      "allSections": "See all parts",
+      "sectionDone": "Done",
+      "sectionNow": "Now",
+      "teamTitle": "Add the care team",
+      "teamSubtitle": "Teachers and specialists send a request with this ID. They see nothing until you approve.",
+      "team": "Team",
+      "pending": "{count, plural, one {# request is waiting — see it} other {# requests are waiting — see them}}",
+      "finish": "Finish",
+      "doneTitle": "{name}'s profile is ready",
+      "doneSubtitle": "From now on, we'll keep track of the small steps together.",
+      "doneNoDiagnosis": "Diagnosis details not added yet",
+      "doneTraits": "About your child — {done, number} of {total, number} parts",
+      "doneCode": "Child ID {code}",
+      "seeTimeline": "Open {name}'s timeline",
+      "firstLog": "Write the first log"
+    },
+    "traits": {
+      "other": "Other (write)",
+      "otherLabel": "In your own words",
+      "otherPlaceholder": "What have you noticed?",
+      "removeTag": "Remove {tag}",
+      "addTagLabel": "Add one",
+      "addTag": "Add",
+      "goalN": "Goal {n, number}",
+      "therapy": {
+        "type": "Therapy",
+        "other": "Other",
+        "otherLabel": "Which therapy?",
+        "remove": "Remove this therapy",
+        "provider": "Where, or with whom",
+        "frequency": "How often",
+        "frequencyPlaceholder": "e.g. twice a week",
+        "add": "Add a therapy"
+      }
+    },
+    "profile": {
+      "activateNudge": "Has {name} been assessed? Turn this record into a companion profile to keep track with the care team.",
+      "activate": "Start",
+      "traitsNudge": "{done, number} of {total, number} parts filled in. The rest helps the care team understand your child.",
+      "continueTraits": "Continue",
+      "diagnosisTitle": "Diagnosis",
+      "edit": "Edit",
+      "what": "What",
+      "when": "When",
+      "by": "By",
+      "noDiagnosis": "Not added yet.",
+      "traitsTitle": "About this child",
+      "updated": "Updated {date} · version {version, number}",
+      "fill": "Fill in",
+      "nothing": "Nothing noted.",
+      "notYet": "Not filled in yet."
+    }
+  },
+  "logs": {
+    "card": {
+      "you": "{name} (you)",
+      "edited": "edited",
+      "correction": "Corrects an earlier entry",
+      "corrected": "Corrected — see the newer entry",
+      "explains": "My note explaining an entry",
+      "edit": "Edit",
+      "correct": "Add a correction"
+    },
+    "explain": {
+      "button": "Explain this to me",
+      "title": "In simple words",
+      "thinking": "Reading the note…",
+      "retry": "Try again",
+      "atHome": "At home:",
+      "askNext": "You could ask next time:",
+      "disclaimer": "Written by AI from this note only. If anything is unclear, ask the person who wrote it.",
+      "save": "Save as my note",
+      "saved": "Saved — only you can see it",
+      "hide": "Hide",
+      "errors": {
+        "ai_not_configured": "Simple explanations aren't switched on right now. The note above is unchanged.",
+        "ai_unavailable": "We couldn't explain this just now. Please try again in a moment."
+      }
+    },
+    "filters": {
+      "author": "Written by",
+      "authors": {
+        "all": "All",
+        "parent": "Parent",
+        "teacher": "Teacher",
+        "specialist": "Specialist"
+      },
+      "domain": "Topic",
+      "type": "Kind",
+      "allTypes": "All kinds"
+    },
+    "empty": {
+      "title": "No entries yet",
+      "message": "Small things count: a new word, a calm evening, a hard morning. Tap “Log” to write the first one.",
+      "filteredTitle": "Nothing matches",
+      "filteredMessage": "Try fewer filters."
+    },
+    "more": "Show older entries",
+    "today": "Today",
+    "templates": {
+      "teacher": "Today in class\nParticipation: \nCommunication: \nBehaviour: \nWhat worked: ",
+      "specialist": "Session focus: \nProgress on goals: \nHome recommendations: \nNext review: "
+    },
+    "visibility": {
+      "care_team": {
+        "label": "Care team",
+        "hint": "Everyone on the care team can see this.",
+        "hintMember": "Everyone on the care team can see this."
+      },
+      "clinical": {
+        "label": "Specialists only",
+        "hint": "Only the parent and specialists can see this.",
+        "hintMember": "Only the parent and specialists can see this."
+      },
+      "private": {
+        "label": "Private",
+        "hint": "Only the parent can see this.",
+        "hintMember": "Only the writer and the parent can see this."
+      }
+    },
+    "progress": {
+      "no_progress": "No progress yet",
+      "some": "Some progress",
+      "good": "Good progress",
+      "achieved": "Achieved!"
+    },
+    "form": {
+      "back": "Back to timeline",
+      "title": "New log for {name}",
+      "titleTeacher": "Classroom note for {name}",
+      "titleSpecialist": "Clinical note for {name}",
+      "editTitle": "Edit entry",
+      "correctTitle": "Add a correction",
+      "correctionNote": "The original stays on the timeline, marked as corrected. This new entry replaces it.",
+      "windowClosed": "This entry can't be edited any more",
+      "windowClosedHint": "Entries can be edited for 24 hours. Add a correction from the timeline instead.",
+      "type": "What kind of entry?",
+      "when": "When?",
+      "domains": "Topics",
+      "rating": "How did it go?",
+      "optional": "(optional)",
+      "text": "What happened?",
+      "textHint": "Any language is fine. A few words are enough.",
+      "templateHint": "Fill in what applies and delete the rest.",
+      "goal": "Is this about a goal?",
+      "noGoal": "No goal",
+      "progress": "Progress on the goal",
+      "mood": "Child's mood",
+      "visibility": "Who can see this?",
+      "sameVisibility": "Seen by the same people as the original entry.",
+      "save": "Save",
+      "saveEdit": "Save changes",
+      "saveCorrection": "Save correction",
+      "emptyError": "Pick a topic or write a few words.",
+      "progressError": "How much progress on the goal?"
+    },
+    "quick": {
+      "fab": "Log",
+      "title": "Quick log",
+      "step": "Step {step, number} of {total, number}",
+      "child": "Which child?",
+      "topics": "What's it about?",
+      "rating": "How was it today?",
+      "text": "What did you see?",
+      "next": "Next",
+      "back": "Change topics",
+      "save": "Save",
+      "whoSees": "The care team can see this.",
+      "saved": "Log saved for {name}: {topics}"
+    },
+    "domains": {
+      "communication": "Communication",
+      "social": "Social",
+      "behaviour_emotions": "Behaviour & feelings",
+      "sensory": "Senses",
+      "daily_living": "Daily living",
+      "learning": "Learning",
+      "motor": "Movement",
+      "sleep": "Sleep",
+      "eating": "Eating"
+    },
+    "types": {
+      "observation": "Observation",
+      "progress": "Progress",
+      "concern": "Concern",
+      "milestone": "First time!",
+      "therapy_session": "Therapy session",
+      "school_day": "School day",
+      "clinical_note": "Clinical note",
+      "activity_done": "Activity done",
+      "check_in": "Monthly check-in"
+    },
+    "faces": {
+      "1": "Very hard",
+      "2": "Hard",
+      "3": "Okay",
+      "4": "Good",
+      "5": "Great"
+    },
+    "moods": {
+      "1": "Upset",
+      "2": "Unsettled",
+      "3": "Calm",
+      "4": "Happy",
+      "5": "Very happy"
+    }
+  },
+  "companionChat": {
+    "title": "Shohojatri AI",
+    "ask": "Ask",
+    "askLong": "Ask Shohojatri AI",
+    "scope": {
+      "parent": "Answers from {name}’s records",
+      "teacher": "Your access: education",
+      "specialist": "Your access: clinical"
+    },
+    "newConversation": "New conversation",
+    "history": {
+      "open": "Past conversations",
+      "title": "Past conversations",
+      "close": "Close",
+      "emptyTitle": "No conversations yet",
+      "empty": "Your first question will show up here.",
+      "loadError": "This conversation couldn’t be opened. Please try again in a little while."
+    },
+    "empty": {
+      "title": "Ask anything about {name}",
+      "note": "I answer only from {name}’s logs and notes. I’m not a doctor and I don’t diagnose."
+    },
+    "thinking": "Checking {name}’s records…",
+    "stop": "Stop",
+    "inputLabel": "Your question",
+    "placeholder": "Ask about {name}…",
+    "send": "Send",
+    "disclaimer": "AI can make mistakes — check important things with your care team.",
+    "retry": "Try again",
+    "errors": {
+      "notConfiguredTitle": "Shohojatri AI is switched off",
+      "notConfigured": "The AI helper isn’t switched on right now. The timeline and profile work as usual.",
+      "quota": "You’ve used today’s questions. You can ask again tomorrow.",
+      "unavailable": "Shohojatri AI can’t answer right now. The problem is on our side — your question is still in the box, so please try again in a little while."
+    },
+    "source": {
+      "parent": "Parent’s log · {date}",
+      "teacher": "Teacher’s note · {date}",
+      "specialist": "Specialist’s note · {date}",
+      "admin": "Note · {date}",
+      "sheetTitle": "Source",
+      "close": "Close",
+      "viewInTimeline": "View in timeline"
+    },
+    "urgent": {
+      "title": "Please talk to a doctor now",
+      "body": "What you wrote could be urgent. This isn’t something to handle in a chat — please get a doctor or emergency help now.",
+      "call": "Call 999",
+      "callNote": "National emergency service",
+      "reassure": "You’re doing the right thing. Later, you can log what happened."
+    },
+    "suggestions": {
+      "play_today": "What can I play with {name} today?",
+      "goal_progress": "How is {name} doing on “{goal}”?",
+      "week_progress": "What has improved for {name} this week?",
+      "school_notes": "What has the teacher written about {name} lately?",
+      "doctor_questions": "What should we ask at the next appointment?",
+      "class_strategies": "Which strategies are working for {name} in class?",
+      "home_practice": "What has the family practised with {name} at home this month?",
+      "calming": "What helps {name} calm down when upset?",
+      "month_summary": "Summarise {name}’s language, social play and sleep over the last month",
+      "open_concerns": "What are the open concerns right now?",
+      "status_report": "Make a status report for {name}"
     }
   }
 }

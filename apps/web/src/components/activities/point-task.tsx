@@ -17,7 +17,7 @@ import { useCapture } from "./capture-provider";
 import { Ball, Boat, Character } from "./character";
 import { ParentControls, Stage, StageToast, TrialDots } from "./stage";
 import { type RunContext, TaskFrame } from "./task-frame";
-import { useToast } from "./use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 type Side = "left" | "right";
 type Variant = "on_screen" | "live";

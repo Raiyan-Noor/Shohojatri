@@ -7,23 +7,28 @@ from sqlalchemy.orm import Session
 
 from app.core import audit
 from app.core.access_requests import expire_stale_requests
+from app.core.characteristics import load_characteristics
 from app.core.child_codes import new_code
 from app.core.dates import BD_TZ, age_in_months, today_bd
 from app.core.deps import DbSession, require_roles
 from app.core.errors import ApiError
+from app.core.logs import visible_clause
 from app.core.permissions import ChildAccess, Holder, Need, require_child_access
 from app.models import (
     AccessGrant,
     AccessRequest,
     AccessRequestStatus,
     AuditLog,
+    Characteristics,
     Child,
+    Log,
     Role,
     User,
 )
 from app.models.base import utcnow
 from app.schemas.access import ActivityActor, ActivityEntry, Grant, IncomingAccessRequest, Person
 from app.schemas.children import ChildCode, ChildOut, CreateChildRequest
+from app.schemas.companion import Diagnosis
 
 router = APIRouter(prefix="/children", tags=["children"])
 
@@ -44,7 +49,7 @@ def create_child(body: CreateChildRequest, user: ParentUser, db: DbSession) -> C
     child = Child(parent_id=user.id, code=new_code(db), name=body.name, dob=body.dob, sex=body.sex)
     db.add(child)
     db.commit()
-    return _child_out(db, ChildAccess(child, user, Holder.parent, None))
+    return child_out(db, ChildAccess(child, user, Holder.parent, None))
 
 
 @router.get("", operation_id="listChildren")
@@ -57,7 +62,7 @@ def list_children(user: ChildViewer, db: DbSession) -> list[ChildOut]:
             .where(Child.parent_id == user.id, Child.deleted_at.is_(None))
             .order_by(Child.created_at)
         )
-        return [_child_out(db, ChildAccess(c, user, Holder.parent, None)) for c in children]
+        return [child_out(db, ChildAccess(c, user, Holder.parent, None)) for c in children]
 
     rows = db.execute(
         select(Child, AccessGrant)
@@ -74,7 +79,7 @@ def list_children(user: ChildViewer, db: DbSession) -> list[ChildOut]:
         audit.record(db, user.id, child.id, Need.read_profile.verb, Need.read_profile.object)
     db.commit()
     return [
-        _child_out(db, ChildAccess(child, user, Holder(grant.scope.value), grant))
+        child_out(db, ChildAccess(child, user, Holder(grant.scope.value), grant))
         for child, grant in rows
     ]
 
@@ -83,7 +88,7 @@ def list_children(user: ChildViewer, db: DbSession) -> list[ChildOut]:
 def get_child(access: ProfileReader, db: DbSession) -> ChildOut:
     if access.holder is Holder.parent:
         expire_stale_requests(db)
-    return _child_out(db, access)
+    return child_out(db, access)
 
 
 @router.post("/{child_id}/regenerate-code", operation_id="regenerateChildCode")
@@ -168,7 +173,7 @@ def list_child_activity(access: AccessManager, db: DbSession) -> list[ActivityEn
     return entries
 
 
-def _child_out(db: Session, access: ChildAccess) -> ChildOut:
+def child_out(db: Session, access: ChildAccess) -> ChildOut:
     child = access.child
     is_parent = access.holder is Holder.parent
     pending = 0
@@ -182,6 +187,25 @@ def _child_out(db: Session, access: ChildAccess) -> ChildOut:
                 AccessRequest.status == AccessRequestStatus.pending,
             )
         )
+    latest = db.scalar(
+        select(Characteristics.answers_json)
+        .where(Characteristics.child_id == child.id)
+        .order_by(Characteristics.version.desc())
+        .limit(1)
+    )
+    new_logs = 0
+    if access.grant is not None:
+        seen = access.grant.logs_seen_at or access.grant.granted_at
+        new_logs = db.scalar(
+            select(func.count())
+            .select_from(Log)
+            .where(
+                Log.child_id == child.id,
+                Log.author_id != access.user.id,
+                Log.created_at > seen,
+                visible_clause(access),
+            )
+        )
     return ChildOut(
         id=child.id,
         name=child.name,
@@ -193,6 +217,10 @@ def _child_out(db: Session, access: ChildAccess) -> ChildOut:
         code=child.code if is_parent else None,
         pending_requests=pending or 0,
         member_since=access.grant.granted_at if access.grant else None,
+        diagnosis=Diagnosis.model_validate(child.diagnosis_json) if child.diagnosis_json else None,
+        characteristics_done=len(latest["sections"]) if latest else 0,
+        characteristics_total=len(load_characteristics().sections),
+        new_logs=new_logs or 0,
     )
 
 

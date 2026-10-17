@@ -27,7 +27,7 @@ import { useCapture, useSample } from "./capture-provider";
 import { Character, type Pose } from "./character";
 import { ParentControls, ParentPill, Stage, StageToast } from "./stage";
 import { type RunContext, TaskFrame } from "./task-frame";
-import { useToast } from "./use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 type Variant = "on_screen" | "live";
 
